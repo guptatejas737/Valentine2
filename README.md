@@ -38,12 +38,18 @@ SMTP_FROM="Valentine Prom <your_email@gmail.com>"
 4. Run locally:
    - `npm run dev`
 
-## Deploy to Render (Free)
-1. Create a new Web Service from your GitHub repo.
-2. Build command: `npm install`
-3. Start command: `npm start`
-4. Add the same `.env` variables in Render dashboard.
-5. Set `GOOGLE_CALLBACK_URL` and `APP_BASE_URL` to your Render URL.
+## Deploy to Vercel (Free)
+1. Push this repo to GitHub.
+2. Create a new project on Vercel and import the repo.
+3. In Project Settings → Environment Variables, add all `.env` values.
+4. Set these for production:
+   - `GOOGLE_CALLBACK_URL=https://YOUR-VERCEL-DOMAIN.vercel.app/auth/google/callback`
+   - `APP_BASE_URL=https://YOUR-VERCEL-DOMAIN.vercel.app`
+5. Deploy. Vercel will detect the `vercel.json` and build a Node serverless function.
+
+### Notes
+- If you change the domain, update the Google OAuth redirect URL in the Google Cloud Console.
+- MongoDB Atlas free tier works well with Vercel.
 
 ## Database
 This project uses MongoDB (free tiers available on MongoDB Atlas).

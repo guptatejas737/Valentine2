@@ -22,12 +22,12 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
-    process.exit(1);
   });
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+app.set("trust proxy", 1);
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -42,7 +42,9 @@ app.use(
       mongoUrl: process.env.MONGO_URI
     }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production"
     }
   })
 );
@@ -84,5 +86,9 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;
 
