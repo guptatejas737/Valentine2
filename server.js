@@ -17,6 +17,21 @@ const publicRoutes = require("./routes/public");
 
 const app = express();
 
+const mongoOptions = {
+  serverSelectionTimeoutMS: 5000
+};
+
+if (process.env.MONGO_URI) {
+  mongoose
+    .connect(process.env.MONGO_URI, mongoOptions)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => {
+      console.error("MongoDB connection error:", err);
+    });
+} else {
+  console.warn("MONGO_URI not set. Sessions will be in-memory only.");
+}
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
@@ -33,21 +48,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production"
-    }
-  })
-);
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production"
+  }
+};
+
+if (process.env.MONGO_URI) {
+  sessionConfig.store = MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    mongoOptions
+  });
+}
+
+app.use(session(sessionConfig));
 
 app.use(passport.initialize());
 app.use(passport.session());
