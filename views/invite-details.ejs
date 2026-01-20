@@ -1,0 +1,61 @@
+<%- include("partials/header") %>
+
+<section class="panel">
+  <h2>Invite details</h2>
+  <div class="status-banner status-<%= invite.status %>">
+    Status: <strong><%= invite.status %></strong>
+  </div>
+
+  <div class="detail-grid">
+    <div>
+      <h3>Recipient</h3>
+      <p><%= invite.recipient.name %> (#<%= invite.recipient.rollNumber %>)</p>
+    </div>
+    <div>
+      <h3>Message</h3>
+      <p><%= invite.message %></p>
+    </div>
+    <div>
+      <h3>Fun Questions</h3>
+      <p><%= invite.questions.q1 || "—" %></p>
+      <p><%= invite.questions.q2 || "—" %></p>
+    </div>
+    <div>
+      <h3>Response</h3>
+      <% if (invite.status === "pending") { %>
+      <p class="muted">Waiting for response.</p>
+      <% } else { %>
+      <p>Rating: <%= invite.response.rating %>/10</p>
+      <p>Comment: <%= invite.response.comment || "—" %></p>
+      <p>Consider: <%= invite.response.consider ? "Yes" : "No" %></p>
+      <% if (invite.response.consider) { %>
+      <p>Phone: <%= invite.response.phone || "—" %></p>
+      <p>Insta: <%= invite.response.insta || "—" %></p>
+      <% } %>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (invite.status === "pending") { %>
+  <div class="divider"></div>
+  <h3>Edit invite (pending only)</h3>
+  <form class="form" action="/invites/<%= invite._id %>/edit" method="POST">
+    <label>
+      Personal message / pickup line
+      <textarea name="message" rows="4" required><%= invite.message %></textarea>
+    </label>
+    <label>
+      Fun question #1
+      <input type="text" name="q1" value="<%= invite.questions.q1 || "" %>" />
+    </label>
+    <label>
+      Fun question #2
+      <input type="text" name="q2" value="<%= invite.questions.q2 || "" %>" />
+    </label>
+    <button class="btn btn-primary" type="submit">Update invite</button>
+  </form>
+  <% } %>
+</section>
+
+<%- include("partials/footer") %>
+

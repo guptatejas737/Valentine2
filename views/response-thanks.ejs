@@ -1,0 +1,12 @@
+<%- include("partials/header") %>
+
+<section class="panel center">
+  <h2>Response submitted</h2>
+  <p class="muted">Thanks for sharing your thoughts. The sender will be notified.</p>
+  <div class="status-banner status-<%= invite.status %>">
+    You responded: <strong><%= invite.status %></strong>
+  </div>
+</section>
+
+<%- include("partials/footer") %>
+

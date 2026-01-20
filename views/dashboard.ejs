@@ -1,0 +1,98 @@
+<%- include("partials/header") %>
+
+<div class="dashboard">
+  <aside class="sidebar">
+    <h3>Invitations</h3>
+    <div class="sidebar-list">
+      <% if (invites.length === 0) { %>
+      <div class="muted">No invites yet.</div>
+      <% } %>
+      <% invites.forEach((invite) => { %>
+      <a class="sidebar-item status-<%= invite.status %>" href="/invites/<%= invite._id %>">
+        <div class="sidebar-title"><%= invite.recipient.name %></div>
+        <div class="sidebar-sub">
+          <span>#<%= invite.recipient.rollNumber %></span>
+          <span class="pill"><%= invite.status %></span>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+  </aside>
+
+  <section class="content">
+    <div class="search-card">
+      <h2>Who do you want to go to prom with?</h2>
+      <div class="search-box">
+        <input id="studentSearch" type="text" placeholder="Search by name or roll number" autocomplete="off" />
+        <input id="studentId" type="hidden" />
+      </div>
+      <div id="results" class="results"></div>
+      <p class="muted tiny">Select a student, then press Enter to create a request.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+  const searchInput = document.getElementById("studentSearch");
+  const studentIdInput = document.getElementById("studentId");
+  const resultsEl = document.getElementById("results");
+
+  let activeIndex = -1;
+  let currentResults = [];
+
+  function renderResults(items) {
+    resultsEl.innerHTML = "";
+    items.forEach((item, index) => {
+      const row = document.createElement("div");
+      row.className = "result-item";
+      row.textContent = `${item.name} (${item.rollNumber})`;
+      row.addEventListener("click", () => selectResult(index));
+      if (index === activeIndex) row.classList.add("active");
+      resultsEl.appendChild(row);
+    });
+  }
+
+  function selectResult(index) {
+    const selected = currentResults[index];
+    if (!selected) return;
+    studentIdInput.value = selected._id;
+    searchInput.value = `${selected.name} (${selected.rollNumber})`;
+    resultsEl.innerHTML = "";
+  }
+
+  searchInput.addEventListener("input", async (e) => {
+    const query = e.target.value.trim();
+    studentIdInput.value = "";
+    activeIndex = -1;
+    if (!query) {
+      resultsEl.innerHTML = "";
+      return;
+    }
+    const res = await fetch(`/api/students?query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    currentResults = data;
+    renderResults(data);
+  });
+
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") {
+      activeIndex = Math.min(activeIndex + 1, currentResults.length - 1);
+      renderResults(currentResults);
+    }
+    if (e.key === "ArrowUp") {
+      activeIndex = Math.max(activeIndex - 1, 0);
+      renderResults(currentResults);
+    }
+    if (e.key === "Enter") {
+      if (!studentIdInput.value && currentResults[activeIndex]) {
+        selectResult(activeIndex);
+      }
+      if (studentIdInput.value) {
+        window.location.href = `/invites/new?studentId=${studentIdInput.value}`;
+      }
+    }
+  });
+</script>
+
+<%- include("partials/footer") %>
+

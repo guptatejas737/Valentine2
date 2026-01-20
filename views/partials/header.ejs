@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Valentine Prom</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Valentine Prom</div>
+      <% if (currentUser) { %>
+      <div class="user-info">
+        <% if (currentUser.avatar) { %>
+        <img src="<%= currentUser.avatar %>" alt="avatar" class="avatar" />
+        <% } %>
+        <div class="user-meta">
+          <div class="user-name"><%= currentUser.name %></div>
+          <div class="user-email"><%= currentUser.email %></div>
+        </div>
+        <a href="/auth/logout" class="btn btn-ghost">Logout</a>
+      </div>
+      <% } %>
+    </header>
+    <main class="page">
+

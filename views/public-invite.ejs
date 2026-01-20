@@ -1,0 +1,71 @@
+<%- include("partials/header") %>
+
+<section class="panel">
+  <h2>Anonymous prom invite</h2>
+  <p class="muted">Someone wants to get to know you. The sender's name is hidden.</p>
+
+  <div class="detail-grid">
+    <div>
+      <h3>Pickup line</h3>
+      <p><%= invite.message %></p>
+    </div>
+    <div>
+      <h3>Fun questions</h3>
+      <p><%= invite.questions.q1 || "—" %></p>
+      <p><%= invite.questions.q2 || "—" %></p>
+    </div>
+  </div>
+
+  <% if (invite.status !== "pending") { %>
+  <div class="status-banner status-<%= invite.status %>">
+    This invite already has a response.
+  </div>
+  <% } else { %>
+  <div class="divider"></div>
+  <form class="form" action="/i/<%= invite.secretToken %>" method="POST">
+    <label>
+      Rate the pickup line (1-10)
+      <input type="number" name="rating" min="1" max="10" required />
+    </label>
+    <label>
+      Comment / review
+      <textarea name="comment" rows="3" placeholder="Your thoughts..."></textarea>
+    </label>
+    <label class="radio-group">
+      Would you consider going on prom with this person, if you get to know them more?
+      <div class="radio-options">
+        <label><input type="radio" name="consider" value="yes" required /> Yes</label>
+        <label><input type="radio" name="consider" value="no" required /> No</label>
+      </div>
+    </label>
+    <div id="contactFields" class="hidden">
+      <label>
+        Phone number
+        <input type="text" name="phone" placeholder="Your phone number" />
+      </label>
+      <label>
+        Instagram handle
+        <input type="text" name="insta" placeholder="@yourhandle" />
+      </label>
+    </div>
+    <button class="btn btn-primary" type="submit">Submit response</button>
+  </form>
+  <% } %>
+</section>
+
+<script>
+  const radios = document.querySelectorAll("input[name='consider']");
+  const contactFields = document.getElementById("contactFields");
+  radios.forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      if (e.target.value === "yes") {
+        contactFields.classList.remove("hidden");
+      } else {
+        contactFields.classList.add("hidden");
+      }
+    });
+  });
+</script>
+
+<%- include("partials/footer") %>
+

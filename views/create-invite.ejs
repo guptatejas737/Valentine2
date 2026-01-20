@@ -1,0 +1,33 @@
+<%- include("partials/header") %>
+
+<section class="panel">
+  <h2>Create request</h2>
+  <p class="muted">
+    You are inviting <strong><%= student.name %></strong> (#<%= student.rollNumber %>).
+    Your name will stay anonymous. Be kind, be fun.
+  </p>
+
+  <form class="form" action="/invites" method="POST">
+    <input type="hidden" name="studentId" value="<%= student._id %>" />
+
+    <label>
+      Personal message / pickup line
+      <textarea name="message" rows="4" required placeholder="Write something sweet, clever, or bold."></textarea>
+    </label>
+
+    <label>
+      Fun question #1
+      <input type="text" name="q1" placeholder="Ex: If we were in a movie, which scene would we be in?" />
+    </label>
+
+    <label>
+      Fun question #2
+      <input type="text" name="q2" placeholder="Ex: Your favorite late-night snack?" />
+    </label>
+
+    <button class="btn btn-primary" type="submit">Send request</button>
+  </form>
+</section>
+
+<%- include("partials/footer") %>
+
