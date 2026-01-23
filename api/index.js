@@ -1,4 +1,11 @@
-const app = require("../server");
+const createApp = require("../app");
 
-module.exports = app;
+let cachedApp;
+
+module.exports = async (req, res) => {
+  if (!cachedApp) {
+    cachedApp = await createApp();
+  }
+  return cachedApp(req, res);
+};
 
