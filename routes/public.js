@@ -1,6 +1,7 @@
 const express = require("express");
 const Invite = require("../models/Invite");
 const { sendMail } = require("../utils/mailer");
+const { responseEmail } = require("../utils/emailTemplates");
 
 const router = express.Router();
 
@@ -45,11 +46,15 @@ router.post("/i/:token", async (req, res, next) => {
     invite.status = invite.response.consider ? "accepted" : "rejected";
     await invite.save();
 
+    const mailContent = responseEmail({
+      recipientName: invite.recipient.name,
+      status: invite.status
+    });
     await sendMail({
       to: invite.sender.email,
       subject: "Your prom invite has a response!",
-      text: `Your invite to ${invite.recipient.name} has been ${invite.status}.`,
-      html: `<p>Your invite to ${invite.recipient.name} has been <strong>${invite.status}</strong>.</p>`
+      text: mailContent.text,
+      html: mailContent.html
     });
 
     return res.render("response-thanks", { invite });

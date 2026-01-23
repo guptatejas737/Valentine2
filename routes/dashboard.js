@@ -10,7 +10,11 @@ router.get("/", ensureAuth, async (req, res, next) => {
       .populate("recipient")
       .sort({ createdAt: -1 });
     const safeInvites = invites.filter((invite) => invite.recipient);
-    res.render("dashboard", { invites: safeInvites });
+    const stats = {
+      totalSent: safeInvites.length,
+      accepted: safeInvites.filter((invite) => invite.status === "accepted").length
+    };
+    res.render("dashboard", { invites: safeInvites, stats });
   } catch (err) {
     next(err);
   }

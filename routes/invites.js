@@ -4,6 +4,7 @@ const Student = require("../models/Student");
 const { ensureAuth } = require("../utils/auth");
 const { generateToken } = require("../utils/token");
 const { sendMail } = require("../utils/mailer");
+const { inviteEmail } = require("../utils/emailTemplates");
 
 const router = express.Router();
 
@@ -59,11 +60,15 @@ router.post("/", ensureAuth, async (req, res, next) => {
           "We could not determine an email for this student. Please try adding them manually."
       });
     }
+    const mailContent = inviteEmail({
+      inviteLink,
+      recipientName: student.name
+    });
     await sendMail({
       to: recipientEmail,
       subject: "You have a new anonymous prom invite!",
-      text: `Someone tagged you in an anonymous confession. View it here: ${inviteLink}`,
-      html: `<p>Someone tagged you in an anonymous confession.</p><p><a href="${inviteLink}">Open your secret invite</a></p>`
+      text: mailContent.text,
+      html: mailContent.html
     });
 
     res.redirect("/dashboard");

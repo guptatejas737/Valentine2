@@ -10,9 +10,15 @@ router.get("/students", ensureAuth, async (req, res, next) => {
     if (!query) {
       return res.json([]);
     }
-    const regex = new RegExp(query, "i");
+    const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(escapeRegex(query), "i");
+    const tokens = query.split(/\s+/).map((token) => token.trim()).filter(Boolean);
+    const nameMatch =
+      tokens.length > 1
+        ? { $and: tokens.map((token) => ({ name: new RegExp(escapeRegex(token), "i") })) }
+        : { name: regex };
     const students = await Student.find({
-      $or: [{ name: regex }, { rollNumber: regex }, { email: regex }]
+      $or: [nameMatch, { rollNumber: regex }, { email: regex }]
     })
       .limit(10)
       .select("name rollNumber email");
@@ -25,15 +31,19 @@ router.get("/students", ensureAuth, async (req, res, next) => {
 router.post("/students/manual", ensureAuth, async (req, res, next) => {
   try {
     const name = (req.body.name || "").trim();
-    const email = (req.body.email || "").trim().toLowerCase();
-    if (!name || !email) {
-      return res.status(400).json({ error: "Name and email are required." });
+    const rollNumber = (req.body.rollNumber || "").trim().toLowerCase();
+    if (!name || !rollNumber) {
+      return res.status(400).json({ error: "Name and roll number are required." });
     }
-    const existing = await Student.findOne({ email });
+    const existing = await Student.findOne({ rollNumber });
     if (existing) {
+      if (existing.name !== name) {
+        existing.name = name;
+        await existing.save();
+      }
       return res.json(existing);
     }
-    const created = await Student.create({ name, email });
+    const created = await Student.create({ name, rollNumber });
     return res.json(created);
   } catch (err) {
     next(err);

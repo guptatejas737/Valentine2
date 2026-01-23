@@ -6,6 +6,16 @@
       <h3 class="text-lg font-semibold text-[#c8ccd4]">Invitations</h3>
       <span class="text-xs text-slate-400">Your tickets</span>
     </div>
+    <div class="stats-card glass-card">
+      <div>
+        <div class="stat-label">Confessions sent</div>
+        <div class="stat-value"><%= stats.totalSent %></div>
+      </div>
+      <div>
+        <div class="stat-label">Accepted</div>
+        <div class="stat-value accent"><%= stats.accepted %></div>
+      </div>
+    </div>
     <div class="sidebar-list">
       <% if (invites.length === 0) { %>
       <div class="muted">No invites yet.</div>
@@ -48,6 +58,18 @@
         <input id="studentId" type="hidden" />
       </div>
       <div id="results" class="results"></div>
+      <div class="manual-card glass-card">
+        <div class="manual-title">Can't find them?</div>
+        <div class="manual-subtitle">Add their roll number + name to continue.</div>
+        <div class="manual-grid">
+          <input id="manualRoll" type="text" class="input-field" placeholder="Roll number" />
+          <input id="manualName" type="text" class="input-field" placeholder="Full name" />
+        </div>
+        <button id="manualSubmit" class="btn btn-outline" type="button">
+          Add &amp; Send
+        </button>
+        <div id="manualError" class="manual-error"></div>
+      </div>
       <p class="muted tiny mt-3">Select a student, then press Enter to create a request.</p>
     </div>
   </section>
@@ -57,6 +79,10 @@
   const searchInput = document.getElementById("studentSearch");
   const studentIdInput = document.getElementById("studentId");
   const resultsEl = document.getElementById("results");
+  const manualRollInput = document.getElementById("manualRoll");
+  const manualNameInput = document.getElementById("manualName");
+  const manualSubmit = document.getElementById("manualSubmit");
+  const manualError = document.getElementById("manualError");
 
   let activeIndex = -1;
   let currentResults = [];
@@ -66,7 +92,8 @@
     items.forEach((item, index) => {
       const row = document.createElement("div");
       row.className = "result-item";
-      row.textContent = `${item.name} (${item.rollNumber})`;
+      const meta = item.rollNumber || item.email || "No roll number";
+      row.textContent = `${item.name} (${meta})`;
       row.addEventListener("click", () => selectResult(index));
       if (index === activeIndex) row.classList.add("active");
       resultsEl.appendChild(row);
@@ -77,8 +104,9 @@
     const selected = currentResults[index];
     if (!selected) return;
     studentIdInput.value = selected._id;
-    searchInput.value = `${selected.name} (${selected.rollNumber})`;
+    searchInput.value = `${selected.name} (${selected.rollNumber || selected.email || ""})`;
     resultsEl.innerHTML = "";
+    window.location.href = `/invites/new?studentId=${selected._id}`;
   }
 
   searchInput.addEventListener("input", async (e) => {
@@ -108,9 +136,34 @@
       if (!studentIdInput.value && currentResults[activeIndex]) {
         selectResult(activeIndex);
       }
-      if (studentIdInput.value) {
-        window.location.href = `/invites/new?studentId=${studentIdInput.value}`;
+    }
+  });
+
+  manualSubmit.addEventListener("click", async () => {
+    manualError.textContent = "";
+    const rollNumber = manualRollInput.value.trim();
+    const name = manualNameInput.value.trim();
+    if (!rollNumber || !name) {
+      manualError.textContent = "Please enter both roll number and name.";
+      return;
+    }
+    manualSubmit.disabled = true;
+    try {
+      const res = await fetch("/api/students/manual", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rollNumber, name })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        manualError.textContent = data.error || "Could not add student.";
+        return;
       }
+      window.location.href = `/invites/new?studentId=${data._id}`;
+    } catch (err) {
+      manualError.textContent = "Network error. Please try again.";
+    } finally {
+      manualSubmit.disabled = false;
     }
   });
 </script>
