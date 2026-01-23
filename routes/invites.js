@@ -26,6 +26,19 @@ router.post("/", ensureAuth, async (req, res, next) => {
     if (!student) {
       return res.redirect("/dashboard");
     }
+    const cooldownMs = 0 * 2 * 24 * 60 * 60 * 1000;
+    const latestInvite = await Invite.findOne({
+      sender: req.user._id,
+      recipient: student._id
+    }).sort({ createdAt: -1 });
+    if (latestInvite && Date.now() - latestInvite.createdAt.getTime() < cooldownMs) {
+      return res.status(429).render("error", {
+        title: "Slow down",
+        message:
+          "You already sent a request to this person recently. Please wait at least 2 days before sending another request."
+      });
+    }
+
     const invite = await Invite.create({
       sender: req.user._id,
       recipient: student._id,
@@ -36,8 +49,16 @@ router.post("/", ensureAuth, async (req, res, next) => {
 
     const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
     const inviteLink = `${baseUrl}/i/${invite.secretToken}`;
+    const recipientEmail = student.getContactEmail();
+    if (!recipientEmail) {
+      return res.status(400).render("error", {
+        title: "Missing email",
+        message:
+          "We could not determine an email for this student. Please try adding them manually."
+      });
+    }
     await sendMail({
-      to: student.email,
+      to: recipientEmail,
       subject: "You have a new anonymous prom invite!",
       text: `Someone tagged you in an anonymous confession. View it here: ${inviteLink}`,
       html: `<p>Someone tagged you in an anonymous confession.</p><p><a href="${inviteLink}">Open your secret invite</a></p>`

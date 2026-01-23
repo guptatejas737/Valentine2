@@ -1,33 +1,54 @@
 <%- include("partials/header") %>
 
 <div class="dashboard">
-  <aside class="sidebar">
-    <h3>Invitations</h3>
+  <aside class="sidebar glass-panel">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-[#c8ccd4]">Invitations</h3>
+      <span class="text-xs text-slate-400">Your tickets</span>
+    </div>
     <div class="sidebar-list">
       <% if (invites.length === 0) { %>
       <div class="muted">No invites yet.</div>
       <% } %>
       <% invites.forEach((invite) => { %>
-      <a class="sidebar-item status-<%= invite.status %>" href="/invites/<%= invite._id %>">
-        <div class="sidebar-title"><%= invite.recipient.name %></div>
-        <div class="sidebar-sub">
-          <span>#<%= invite.recipient.rollNumber %></span>
-          <span class="pill"><%= invite.status %></span>
+      <a class="invite-card status-<%= invite.status %>" href="/invites/<%= invite._id %>">
+        <div class="flex items-center justify-between">
+          <div class="text-sm font-semibold text-slate-100"><%= invite.recipient.name %></div>
+          <span class="status-dot"></span>
         </div>
+        <div class="invite-meta">
+          <span>#<%= invite.recipient.rollNumber %></span>
+          <span class="uppercase tracking-[0.3em] text-[10px]"><%= invite.status %></span>
+        </div>
+        <% if (invite.status === "accepted") { %>
+        <div class="mt-3">
+          <span class="btn btn-primary btn-mini">Reveal Contact</span>
+        </div>
+        <% } %>
       </a>
       <% }) %>
     </div>
   </aside>
 
   <section class="content">
-    <div class="search-card">
-      <h2>Who do you want to go to prom with?</h2>
-      <div class="search-box">
-        <input id="studentSearch" type="text" placeholder="Search by name or roll number" autocomplete="off" />
+    <div class="search-card glass-panel w-full max-w-2xl text-center">
+      <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Command Search</p>
+      <h2 class="mt-3 text-2xl font-semibold text-[#c8ccd4]">Who caught your eye?</h2>
+      <p class="mt-2 text-sm text-slate-300">
+        Find their profile and send a confession before someone else does.
+      </p>
+      <div class="spotlight-wrap">
+        <input
+          id="studentSearch"
+          type="text"
+          class="spotlight-input"
+          placeholder="Who caught your eye? (Name or Roll No)"
+          autocomplete="off"
+        />
         <input id="studentId" type="hidden" />
       </div>
       <div id="results" class="results"></div>
-      <p class="muted tiny">Select a student, then press Enter to create a request.</p>
+      <p class="muted tiny mt-3">Select a student, then press Enter to create a request.</p>
     </div>
   </section>
 </div>

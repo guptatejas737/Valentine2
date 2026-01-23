@@ -1,36 +1,37 @@
 <%- include("partials/header") %>
 
-<section class="panel">
-  <h2>Invite details</h2>
-  <div class="status-banner status-<%= invite.status %>">
+<section class="panel glass-panel">
+  <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Invite details</p>
+  <h2 class="mt-2 text-2xl font-semibold text-[#c8ccd4]">Your confession ticket</h2>
+  <div class="status-banner status-<%= invite.status %> mt-4">
     Status: <strong><%= invite.status %></strong>
   </div>
 
-  <div class="detail-grid">
-    <div>
-      <h3>Recipient</h3>
-      <p><%= invite.recipient.name %> (#<%= invite.recipient.rollNumber %>)</p>
+  <div class="detail-grid mt-6">
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Recipient</h3>
+      <p class="mt-2 text-slate-200"><%= invite.recipient.name %> (#<%= invite.recipient.rollNumber %>)</p>
     </div>
-    <div>
-      <h3>Message</h3>
-      <p><%= invite.message %></p>
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Message</h3>
+      <p class="mt-2 text-slate-200"><%= invite.message %></p>
     </div>
-    <div>
-      <h3>Fun Questions</h3>
-      <p><%= invite.questions.q1 || "—" %></p>
-      <p><%= invite.questions.q2 || "—" %></p>
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Fun Questions</h3>
+      <p class="mt-2 text-slate-200"><%= invite.questions.q1 || "—" %></p>
+      <p class="mt-2 text-slate-200"><%= invite.questions.q2 || "—" %></p>
     </div>
-    <div>
-      <h3>Response</h3>
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Response</h3>
       <% if (invite.status === "pending") { %>
-      <p class="muted">Waiting for response.</p>
+      <p class="mt-2 muted">Waiting for response.</p>
       <% } else { %>
-      <p>Rating: <%= invite.response.rating %>/10</p>
-      <p>Comment: <%= invite.response.comment || "—" %></p>
-      <p>Consider: <%= invite.response.consider ? "Yes" : "No" %></p>
+      <p class="mt-2 text-slate-200">Rating: <%= invite.response.rating %>/10</p>
+      <p class="mt-2 text-slate-200">Comment: <%= invite.response.comment || "—" %></p>
+      <p class="mt-2 text-slate-200">Consider: <%= invite.response.consider ? "Yes" : "No" %></p>
       <% if (invite.response.consider) { %>
-      <p>Phone: <%= invite.response.phone || "—" %></p>
-      <p>Insta: <%= invite.response.insta || "—" %></p>
+      <p class="mt-2 text-slate-200">Phone: <%= invite.response.phone || "—" %></p>
+      <p class="mt-2 text-slate-200">Insta: <%= invite.response.insta || "—" %></p>
       <% } %>
       <% } %>
     </div>
@@ -38,19 +39,19 @@
 
   <% if (invite.status === "pending") { %>
   <div class="divider"></div>
-  <h3>Edit invite (pending only)</h3>
+  <h3 class="text-lg font-semibold text-[#c8ccd4]">Edit invite (pending only)</h3>
   <form class="form" action="/invites/<%= invite._id %>/edit" method="POST">
     <label>
       Personal message / pickup line
-      <textarea name="message" rows="4" required><%= invite.message %></textarea>
+      <textarea name="message" rows="4" required class="textarea-field"><%= invite.message %></textarea>
     </label>
     <label>
       Fun question #1
-      <input type="text" name="q1" value="<%= invite.questions.q1 || "" %>" />
+      <input type="text" name="q1" class="input-field" value="<%= invite.questions.q1 || "" %>" />
     </label>
     <label>
       Fun question #2
-      <input type="text" name="q2" value="<%= invite.questions.q2 || "" %>" />
+      <input type="text" name="q2" class="input-field" value="<%= invite.questions.q2 || "" %>" />
     </label>
     <button class="btn btn-primary" type="submit">Update invite</button>
   </form>

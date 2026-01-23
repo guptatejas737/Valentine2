@@ -17,13 +17,15 @@ An anonymous prom invitation site built with Node.js, Express, MongoDB, Google O
 PORT=3000
 MONGO_URI=your_mongodb_connection
 SESSION_SECRET=replace_with_long_secret
+MONGO_FALLBACK_URI=mongodb://127.0.0.1:27017/valentine_prom
 
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
 ALLOWED_EMAIL_DOMAIN=college.edu
 
 APP_BASE_URL=http://localhost:3000
+# Optional override; defaults to APP_BASE_URL + /auth/google/callback
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
 
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
@@ -53,4 +55,6 @@ SMTP_FROM="Valentine Prom <your_email@gmail.com>"
 
 ## Database
 This project uses MongoDB (free tiers available on MongoDB Atlas).
+If you use Atlas, make sure your current IP address is in the Atlas allowlist.
+For local development, you can set `MONGO_FALLBACK_URI` to a local MongoDB instance.
 

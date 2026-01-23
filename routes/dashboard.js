@@ -9,7 +9,8 @@ router.get("/", ensureAuth, async (req, res, next) => {
     const invites = await Invite.find({ sender: req.user._id })
       .populate("recipient")
       .sort({ createdAt: -1 });
-    res.render("dashboard", { invites });
+    const safeInvites = invites.filter((invite) => invite.recipient);
+    res.render("dashboard", { invites: safeInvites });
   } catch (err) {
     next(err);
   }
