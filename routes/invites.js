@@ -19,6 +19,8 @@ router.get("/new", ensureAuth, async (req, res, next) => {
   }
 });
 
+router.get("/", ensureAuth, (req, res) => res.redirect("/dashboard"));
+
 router.post("/", ensureAuth, async (req, res, next) => {
   try {
     const { studentId, message, q1, q2 } = req.body;
@@ -64,7 +66,7 @@ router.post("/", ensureAuth, async (req, res, next) => {
       html: `<p>Someone tagged you in an anonymous confession.</p><p><a href="${inviteLink}">Open your secret invite</a></p>`
     });
 
-    res.redirect(`/invites/${invite._id}`);
+    res.redirect("/dashboard");
   } catch (err) {
     next(err);
   }
