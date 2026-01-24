@@ -77,5 +77,35 @@ const responseEmail = ({ recipientName, status }) => {
   return { html, text };
 };
 
-module.exports = { inviteEmail, responseEmail };
+const followupInviteEmail = ({ inviteLink, recipientName }) => {
+  const html = wrapEmail({
+    title: "A follow-up message is waiting",
+    subtitle: recipientName ? `For ${recipientName}` : undefined,
+    bodyHtml: `
+      <p>Someone sent you a longer, thoughtful follow-up message.</p>
+      <p style="margin:20px 0;">
+        <a href="${inviteLink}" style="display:inline-block;padding:12px 22px;border-radius:999px;background:linear-gradient(135deg,#ff0055,#7000ff);color:#fff;text-decoration:none;font-weight:600;">Read the message</a>
+      </p>
+      <p style="color:#c7cad1;font-size:13px;">If the button doesn’t work, copy this link:</p>
+      <p style="word-break:break-all;font-size:13px;color:#f5c2d6;">${inviteLink}</p>
+    `
+  });
+  const text = `A follow-up message is waiting. Read it here: ${inviteLink}`;
+  return { html, text };
+};
+
+const followupResponseEmail = ({ recipientName }) => {
+  const html = wrapEmail({
+    title: "Your follow-up got a response",
+    subtitle: recipientName ? `${recipientName} replied to your follow-up.` : undefined,
+    bodyHtml: `
+      <p>Your follow-up message received a response.</p>
+      <p style="margin-top:16px;">Log in to view the details on your dashboard.</p>
+    `
+  });
+  const text = `Your follow-up message received a response.`;
+  return { html, text };
+};
+
+module.exports = { inviteEmail, responseEmail, followupInviteEmail, followupResponseEmail };
 

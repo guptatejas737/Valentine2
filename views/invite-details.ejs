@@ -76,6 +76,43 @@
     <button class="btn btn-primary" type="submit">Update invite</button>
   </form>
   <% } %>
+
+  <% if (invite.status !== "pending") { %>
+  <div class="divider"></div>
+  <h3 class="text-lg font-semibold text-[#c8ccd4]">Follow-up messages</h3>
+  <% const canFollowup = invite.response?.contactMethod === "followup" || (invite.followups || []).some((entry) => entry.response?.allowFollowup); %>
+  <% if (canFollowup) { %>
+  <a class="btn btn-outline mt-3" href="/invites/<%= invite._id %>/followup">Send an anonymous follow-up</a>
+  <% } else { %>
+  <p class="muted mt-2">They haven’t requested another anonymous message yet.</p>
+  <% } %>
+  <% if (invite.followups && invite.followups.length) { %>
+  <div class="detail-grid mt-4">
+    <% invite.followups.forEach((entry) => { %>
+    <div class="glass-card p-5">
+      <h4 class="text-sm uppercase tracking-[0.3em] text-slate-400">Your follow-up</h4>
+      <p class="mt-2 text-slate-200"><%= entry.message %></p>
+      <% if (entry.response && entry.response.message) { %>
+      <div class="divider"></div>
+      <h4 class="text-sm uppercase tracking-[0.3em] text-slate-400">Their response</h4>
+      <p class="mt-2 text-slate-200"><%= entry.response.message %></p>
+      <% if (entry.response.contactMethod === "phone") { %>
+      <p class="mt-2 text-slate-200">Phone: <%= entry.response.phone || "—" %></p>
+      <% } %>
+      <% if (entry.response.contactMethod === "insta") { %>
+      <p class="mt-2 text-slate-200">Instagram: <%= entry.response.insta || "—" %></p>
+      <% } %>
+      <% if (entry.response.contactMethod === "followup") { %>
+      <p class="mt-2 text-slate-200">Follow-up: One more anonymous message requested.</p>
+      <% } %>
+      <% } else { %>
+      <p class="mt-2 muted">Waiting for a response.</p>
+      <% } %>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+  <% } %>
 </section>
 
 <%- include("partials/footer") %>

@@ -35,6 +35,20 @@ const InviteSchema = new mongoose.Schema(
       contactMethod: { type: String },
       allowFollowup: { type: Boolean }
     },
+    followups: [
+      {
+        message: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+        response: {
+          message: { type: String },
+          contactMethod: { type: String },
+          phone: { type: String },
+          insta: { type: String },
+          allowFollowup: { type: Boolean },
+          createdAt: { type: Date }
+        }
+      }
+    ],
     secretToken: { type: String, required: true, unique: true }
   },
   { timestamps: true }

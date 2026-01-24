@@ -4,7 +4,7 @@ const Student = require("../models/Student");
 const { ensureAuth } = require("../utils/auth");
 const { generateToken } = require("../utils/token");
 const { sendMail } = require("../utils/mailer");
-const { inviteEmail } = require("../utils/emailTemplates");
+const { inviteEmail, followupInviteEmail } = require("../utils/emailTemplates");
 
 const router = express.Router();
 
@@ -135,6 +135,69 @@ router.post("/:id/edit", ensureAuth, async (req, res, next) => {
     await invite.save();
     // Force a GET after POST to avoid method-preserving redirects.
     res.redirect(303, `/invites/${invite._id}`);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:id/followup", ensureAuth, async (req, res, next) => {
+  try {
+    const invite = await Invite.findById(req.params.id).populate("recipient");
+    if (!invite || invite.sender.toString() !== req.user._id.toString()) {
+      return res.redirect("/dashboard");
+    }
+    const canFollowup =
+      invite.response?.contactMethod === "followup" ||
+      invite.followups?.some((entry) => entry.response?.allowFollowup);
+    if (!canFollowup) {
+      return res.redirect(`/invites/${invite._id}`);
+    }
+    return res.render("send-followup", { invite });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/:id/followup", ensureAuth, async (req, res, next) => {
+  try {
+    const invite = await Invite.findById(req.params.id).populate("recipient");
+    if (!invite || invite.sender.toString() !== req.user._id.toString()) {
+      return res.redirect("/dashboard");
+    }
+    const canFollowup =
+      invite.response?.contactMethod === "followup" ||
+      invite.followups?.some((entry) => entry.response?.allowFollowup);
+    if (!canFollowup) {
+      return res.redirect(`/invites/${invite._id}`);
+    }
+    const message = (req.body.message || "").trim().slice(0, 1500);
+    if (!message) {
+      return res.status(400).render("error", {
+        title: "Missing message",
+        message: "Please write a message before sending."
+      });
+    }
+    invite.followups.push({ message });
+    await invite.save();
+
+    const followup = invite.followups[invite.followups.length - 1];
+    const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const followupLink = `${baseUrl}/i/${invite.secretToken}/followup/${followup._id}`;
+    const recipientEmail = invite.recipient.getContactEmail();
+    if (recipientEmail) {
+      const mailContent = followupInviteEmail({
+        inviteLink: followupLink,
+        recipientName: invite.recipient.name
+      });
+      await sendMail({
+        to: recipientEmail,
+        subject: "A follow-up message is waiting",
+        text: mailContent.text,
+        html: mailContent.html
+      });
+    }
+
+    return res.redirect(303, `/invites/${invite._id}`);
   } catch (err) {
     next(err);
   }

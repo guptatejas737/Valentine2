@@ -34,6 +34,12 @@
         <div class="mt-3">
           <span class="btn btn-primary btn-mini">Reveal Contact</span>
         </div>
+        <% const canFollowup = invite.response?.contactMethod === "followup" || (invite.followups || []).some((entry) => entry.response?.allowFollowup); %>
+        <% if (canFollowup) { %>
+        <div class="mt-2">
+          <span class="btn btn-outline btn-mini">Send follow-up</span>
+        </div>
+        <% } %>
         <% } %>
       </a>
       <% }) %>
