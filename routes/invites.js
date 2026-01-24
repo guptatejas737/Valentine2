@@ -97,13 +97,14 @@ router.post("/:id/edit", ensureAuth, async (req, res, next) => {
       return res.redirect("/dashboard");
     }
     if (invite.status !== "pending") {
-      return res.redirect(`/invites/${invite._id}`);
+      return res.redirect(303, `/invites/${invite._id}`);
     }
     invite.message = req.body.message || invite.message;
     invite.questions.q1 = req.body.q1 || invite.questions.q1;
     invite.questions.q2 = req.body.q2 || invite.questions.q2;
     await invite.save();
-    res.redirect(`/invites/${invite._id}`);
+    // Force a GET after POST to avoid method-preserving redirects.
+    res.redirect(303, `/invites/${invite._id}`);
   } catch (err) {
     next(err);
   }
