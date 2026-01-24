@@ -234,6 +234,23 @@ a {
   padding: 20px;
   max-height: calc(100vh - 160px);
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 0, 85, 0.65) rgba(255, 255, 255, 0.08);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(255, 0, 85, 0.9), rgba(112, 0, 255, 0.9));
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.35);
 }
 
 .sidebar-list {
