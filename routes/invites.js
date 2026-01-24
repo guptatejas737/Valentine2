@@ -71,7 +71,8 @@ router.post("/", ensureAuth, async (req, res, next) => {
       html: mailContent.html
     });
 
-    res.redirect("/dashboard");
+    // Force a GET after POST to avoid method-preserving redirects.
+    res.redirect(303, "/dashboard");
   } catch (err) {
     next(err);
   }
