@@ -37,13 +37,37 @@ router.post("/i/:token", async (req, res, next) => {
       return res.render("public-invite", { invite });
     }
 
-    const { rating, comment, consider, phone, insta } = req.body;
-    invite.response.rating = Number(rating);
-    invite.response.comment = comment;
-    invite.response.consider = consider === "yes";
-    invite.response.phone = consider === "yes" ? phone : "";
-    invite.response.insta = consider === "yes" ? insta : "";
-    invite.status = invite.response.consider ? "accepted" : "rejected";
+    const feeling = (req.body.feeling || "").trim();
+    const standout = (req.body.standout || "").trim();
+    const openness = (req.body.openness || "").trim();
+    const contactMethod = (req.body.contactMethod || "").trim();
+    const phone = (req.body.phone || "").trim();
+    const insta = (req.body.insta || "").trim();
+    const allowFollowup = Boolean(req.body.allowFollowup);
+
+    if (!feeling || !standout || !["yes", "maybe", "no"].includes(openness)) {
+      return res.status(400).render("error", {
+        title: "Missing response",
+        message: "Please answer each question before submitting."
+      });
+    }
+
+    invite.response.feeling = feeling;
+    invite.response.standout = standout;
+    invite.response.openness = openness;
+    const isOpen = openness === "yes";
+    invite.response.contactMethod = isOpen ? contactMethod : "";
+    invite.response.phone = isOpen && contactMethod === "phone" ? phone : "";
+    invite.response.insta = isOpen && contactMethod === "insta" ? insta : "";
+    invite.response.allowFollowup = isOpen && contactMethod === "followup";
+
+    if (openness === "yes") {
+      invite.status = "accepted";
+    } else if (openness === "maybe") {
+      invite.status = "maybe";
+    } else {
+      invite.status = "rejected";
+    }
     await invite.save();
 
     const mailContent = responseEmail({

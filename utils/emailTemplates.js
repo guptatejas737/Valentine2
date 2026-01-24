@@ -50,13 +50,26 @@ const inviteEmail = ({ inviteLink, recipientName }) => {
 };
 
 const responseEmail = ({ recipientName, status }) => {
-  const statusText = status === "accepted" ? "accepted" : "responded to";
+  const statusText =
+    status === "accepted"
+      ? "accepted"
+      : status === "maybe"
+        ? "is open to talking"
+        : "responded to";
+  const subtitle =
+    recipientName && status === "maybe"
+      ? `${recipientName} is open to talking.`
+      : recipientName
+        ? `${recipientName} has ${statusText} your invite.`
+        : undefined;
   const html = wrapEmail({
     title: "Your invite has a response",
-    subtitle: recipientName ? `${recipientName} has ${statusText} your invite.` : undefined,
+    subtitle,
     bodyHtml: `
       <p>Your anonymous confession received a response.</p>
-      <p style="margin-top:12px;">Status: <strong style="color:${status === "accepted" ? "#34d399" : "#ff5a6e"};">${status}</strong></p>
+      <p style="margin-top:12px;">Status: <strong style="color:${
+        status === "accepted" ? "#34d399" : status === "maybe" ? "#f2c94c" : "#ff5a6e"
+      };">${status}</strong></p>
       <p style="margin-top:16px;">Log in to view the details on your dashboard.</p>
     `
   });

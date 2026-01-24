@@ -2,7 +2,7 @@
 
 <section class="panel glass-panel">
   <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Invite details</p>
-  <h2 class="mt-2 text-2xl font-semibold text-[#c8ccd4]">Your confession ticket</h2>
+  <h2 class="mt-2 text-2xl font-semibold text-[#c8ccd4]">Your thoughtful invite</h2>
   <div class="status-banner status-<%= invite.status %> mt-4">
     Status: <strong><%= invite.status %></strong>
   </div>
@@ -13,25 +13,37 @@
       <p class="mt-2 text-slate-200"><%= invite.recipient.name %> (#<%= invite.recipient.rollNumber %>)</p>
     </div>
     <div class="glass-card p-5">
-      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Message</h3>
-      <p class="mt-2 text-slate-200"><%= invite.message %></p>
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Why you?</h3>
+      <p class="mt-2 text-slate-200"><%= invite.whyYou || "—" %></p>
     </div>
     <div class="glass-card p-5">
-      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Fun Questions</h3>
-      <p class="mt-2 text-slate-200"><%= invite.questions.q1 || "—" %></p>
-      <p class="mt-2 text-slate-200"><%= invite.questions.q2 || "—" %></p>
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Who I am (without my name)</h3>
+      <p class="mt-2 text-slate-200">Green flag: <%= invite.about?.greenFlag || "—" %></p>
+      <p class="mt-2 text-slate-200">Passion: <%= invite.about?.passion || "—" %></p>
+      <p class="mt-2 text-slate-200">Trait: <%= invite.about?.trait || "—" %></p>
+    </div>
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">The message</h3>
+      <p class="mt-2 text-slate-200"><%= invite.message %></p>
     </div>
     <div class="glass-card p-5">
       <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Response</h3>
       <% if (invite.status === "pending") { %>
       <p class="mt-2 muted">Waiting for response.</p>
       <% } else { %>
-      <p class="mt-2 text-slate-200">Rating: <%= invite.response.rating %>/10</p>
-      <p class="mt-2 text-slate-200">Comment: <%= invite.response.comment || "—" %></p>
-      <p class="mt-2 text-slate-200">Consider: <%= invite.response.consider ? "Yes" : "No" %></p>
-      <% if (invite.response.consider) { %>
+      <p class="mt-2 text-slate-200">Feeling: <%= invite.response.feeling || "—" %></p>
+      <p class="mt-2 text-slate-200">What stood out: <%= invite.response.standout || "—" %></p>
+      <p class="mt-2 text-slate-200">Open to connect: <%= invite.response.openness || "—" %></p>
+      <% if (invite.response.openness === "yes") { %>
+      <% if (invite.response.contactMethod === "phone") { %>
       <p class="mt-2 text-slate-200">Phone: <%= invite.response.phone || "—" %></p>
-      <p class="mt-2 text-slate-200">Insta: <%= invite.response.insta || "—" %></p>
+      <% } %>
+      <% if (invite.response.contactMethod === "insta") { %>
+      <p class="mt-2 text-slate-200">Instagram: <%= invite.response.insta || "—" %></p>
+      <% } %>
+      <% if (invite.response.contactMethod === "followup") { %>
+      <p class="mt-2 text-slate-200">Follow-up: One more anonymous message requested.</p>
+      <% } %>
       <% } %>
       <% } %>
     </div>
@@ -42,16 +54,24 @@
   <h3 class="text-lg font-semibold text-[#c8ccd4]">Edit invite (pending only)</h3>
   <form class="form" action="/invites/<%= invite._id %>/edit" method="POST">
     <label>
-      Personal message / pickup line
-      <textarea name="message" rows="4" required class="textarea-field"><%= invite.message %></textarea>
+      Section A — Why You?
+      <textarea name="whyYou" rows="3" required maxlength="220" class="textarea-field"><%= invite.whyYou || "" %></textarea>
     </label>
     <label>
-      Fun question #1
-      <input type="text" name="q1" class="input-field" value="<%= invite.questions.q1 || "" %>" />
+      One green flag about me
+      <input type="text" name="greenFlag" required maxlength="120" class="input-field" value="<%= invite.about?.greenFlag || "" %>" />
     </label>
     <label>
-      Fun question #2
-      <input type="text" name="q2" class="input-field" value="<%= invite.questions.q2 || "" %>" />
+      One thing I’m genuinely passionate about
+      <input type="text" name="passion" required maxlength="120" class="input-field" value="<%= invite.about?.passion || "" %>" />
+    </label>
+    <label>
+      One honest (but respectful) trait
+      <input type="text" name="trait" required maxlength="120" class="input-field" value="<%= invite.about?.trait || "" %>" />
+    </label>
+    <label>
+      Section C — The Message
+      <textarea name="message" rows="4" required maxlength="600" class="textarea-field"><%= invite.message %></textarea>
     </label>
     <button class="btn btn-primary" type="submit">Update invite</button>
   </form>

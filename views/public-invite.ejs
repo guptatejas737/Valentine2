@@ -1,79 +1,186 @@
 <%- include("partials/header") %>
 
 <section class="panel glass-panel">
-  <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Anonymous prom invite</p>
+  <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Anonymous invite</p>
   <h2 class="mt-3 text-2xl font-semibold text-[#c8ccd4]">A message found you</h2>
-  <p class="mt-2 text-sm text-slate-300">Someone wants to get to know you. The sender's name is hidden.</p>
-
-  <div class="detail-grid mt-6">
-    <div class="glass-card p-5">
-      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Pickup line</h3>
-      <p class="mt-3 quote">“<%= invite.message %>”</p>
-    </div>
-    <div class="glass-card p-5">
-      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Fun questions</h3>
-      <p class="mt-3 text-slate-200"><%= invite.questions.q1 || "—" %></p>
-      <p class="mt-2 text-slate-200"><%= invite.questions.q2 || "—" %></p>
-    </div>
-  </div>
+  <p class="mt-2 text-sm text-slate-300">
+    Someone from your institute sent you something they thought about for a while.
+  </p>
 
   <% if (invite.status !== "pending") { %>
   <div class="status-banner status-<%= invite.status %> mt-6">
     This invite already has a response.
   </div>
   <% } else { %>
-  <div class="divider"></div>
-  <form class="form" action="/i/<%= invite.secretToken %>" method="POST">
-    <label>
-      Rate the pickup line (1-10)
-      <input type="number" name="rating" min="1" max="10" required class="input-field" />
-    </label>
-    <label>
-      Comment / review
-      <textarea name="comment" rows="3" class="textarea-field" placeholder="Your thoughts..."></textarea>
-    </label>
-    <div>
+  <div class="reveal-step mt-6" data-step="1">
+    <div class="glass-card p-5">
       <p class="text-sm text-slate-300">
-        Would you consider going on prom with this person, if you get to know them more?
+        This is anonymous, and you’re in control of how much you want to see.
       </p>
-      <div class="choice-grid mt-3">
-        <label class="choice-card">
-          <input type="radio" name="consider" value="no" required />
-          <span class="choice-card__content choice-muted">Not my vibe</span>
-        </label>
-        <label class="choice-card">
-          <input type="radio" name="consider" value="yes" required />
-          <span class="choice-card__content choice-yes">I'm interested...</span>
-        </label>
-      </div>
+      <button class="btn btn-primary mt-4" type="button" data-next="2">I’m curious</button>
     </div>
-    <div id="contactFields" class="accordion">
-      <div class="grid gap-4 mt-4">
-        <label>
-          Phone number
-          <input type="text" name="phone" class="input-field" placeholder="Your phone number" />
-        </label>
-        <label>
-          Instagram handle
-          <input type="text" name="insta" class="input-field" placeholder="@yourhandle" />
-        </label>
-      </div>
+  </div>
+
+  <div class="reveal-step is-hidden mt-6" data-step="2">
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Why you?</h3>
+      <p class="mt-3 text-slate-200"><%= invite.whyYou || invite.message %></p>
+      <button class="btn btn-outline mt-4" type="button" data-next="3">Tell me more</button>
     </div>
-    <button class="btn btn-primary" type="submit">Submit response</button>
-  </form>
+  </div>
+
+  <div class="reveal-step is-hidden mt-6" data-step="3">
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Who I am (without my name)</h3>
+      <p class="mt-2 text-slate-200">Green flag: <%= invite.about?.greenFlag || "—" %></p>
+      <p class="mt-2 text-slate-200">Passion: <%= invite.about?.passion || "—" %></p>
+      <p class="mt-2 text-slate-200">Trait: <%= invite.about?.trait || "—" %></p>
+      <button class="btn btn-outline mt-4" type="button" data-next="4">Read the message</button>
+    </div>
+  </div>
+
+  <div class="reveal-step is-hidden mt-6" data-step="4">
+    <div class="glass-card p-5">
+      <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">The message</h3>
+      <p class="mt-3 quote">“<%= invite.message %>”</p>
+    </div>
+    <div class="divider"></div>
+    <form class="form" action="/i/<%= invite.secretToken %>" method="POST">
+      <div>
+        <p class="text-sm text-slate-300">How did this message make you feel?</p>
+        <div class="choice-grid mt-3">
+          <label class="choice-card">
+            <input type="radio" name="feeling" value="curious" required />
+            <span class="choice-card__content">Curious</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="feeling" value="flattered" required />
+            <span class="choice-card__content">Flattered</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="feeling" value="neutral" required />
+            <span class="choice-card__content choice-muted">Neutral</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="feeling" value="unsure" required />
+            <span class="choice-card__content choice-muted">Unsure</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <p class="text-sm text-slate-300">What stood out the most?</p>
+        <div class="choice-grid mt-3">
+          <label class="choice-card">
+            <input type="radio" name="standout" value="honesty" required />
+            <span class="choice-card__content">His honesty</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="standout" value="effort" required />
+            <span class="choice-card__content">His effort</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="standout" value="vulnerability" required />
+            <span class="choice-card__content">His vulnerability</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="standout" value="clarity" required />
+            <span class="choice-card__content">His clarity</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <p class="text-sm text-slate-300">
+          Would you be open to knowing him better, if he reaches out respectfully?
+        </p>
+        <div class="choice-grid mt-3">
+          <label class="choice-card">
+            <input type="radio" name="openness" value="yes" required />
+            <span class="choice-card__content choice-yes">Yes, I’d like that</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="openness" value="maybe" required />
+            <span class="choice-card__content">Maybe, I need more time</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="openness" value="no" required />
+            <span class="choice-card__content choice-muted">No, but I appreciate the message</span>
+          </label>
+        </div>
+      </div>
+      <div id="contactFields" class="accordion">
+        <p class="text-sm text-slate-300 mt-4">
+          If you’re comfortable, you can leave one way for him to reach you.
+        </p>
+        <div class="choice-grid mt-3">
+          <label class="choice-card">
+            <input type="radio" name="contactMethod" value="phone" />
+            <span class="choice-card__content">Phone number</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="contactMethod" value="insta" />
+            <span class="choice-card__content">Instagram handle</span>
+          </label>
+          <label class="choice-card">
+            <input type="radio" name="contactMethod" value="followup" />
+            <span class="choice-card__content">Let him send one more anonymous message</span>
+          </label>
+        </div>
+        <div id="phoneField" class="mt-4 is-hidden">
+          <label>
+            Phone number
+            <input type="text" name="phone" class="input-field" placeholder="Your phone number" />
+          </label>
+        </div>
+        <div id="instaField" class="mt-4 is-hidden">
+          <label>
+            Instagram handle
+            <input type="text" name="insta" class="input-field" placeholder="@yourhandle" />
+          </label>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Send response</button>
+    </form>
+  </div>
   <% } %>
 </section>
 
 <script>
-  const radios = document.querySelectorAll("input[name='consider']");
+  const steps = document.querySelectorAll(".reveal-step");
+  const nextButtons = document.querySelectorAll("[data-next]");
+  const opennessRadios = document.querySelectorAll("input[name='openness']");
   const contactFields = document.getElementById("contactFields");
-  radios.forEach((radio) => {
+  const contactRadios = document.querySelectorAll("input[name='contactMethod']");
+  const phoneField = document.getElementById("phoneField");
+  const instaField = document.getElementById("instaField");
+
+  nextButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextStep = button.getAttribute("data-next");
+      steps.forEach((step) => {
+        if (step.getAttribute("data-step") === nextStep) {
+          step.classList.remove("is-hidden");
+        }
+      });
+    });
+  });
+
+  opennessRadios.forEach((radio) => {
     radio.addEventListener("change", (e) => {
       if (e.target.value === "yes") {
         contactFields.classList.add("is-open");
       } else {
         contactFields.classList.remove("is-open");
+        contactRadios.forEach((r) => (r.checked = false));
+        phoneField.classList.add("is-hidden");
+        instaField.classList.add("is-hidden");
       }
+    });
+  });
+
+  contactRadios.forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      phoneField.classList.toggle("is-hidden", e.target.value !== "phone");
+      instaField.classList.toggle("is-hidden", e.target.value !== "insta");
     });
   });
 </script>

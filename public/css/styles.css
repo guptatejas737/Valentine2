@@ -311,6 +311,10 @@ a {
   color: #f2c94c;
 }
 
+.status-maybe {
+  color: #f2c94c;
+}
+
 .status-accepted {
   color: #34d399;
 }
@@ -322,6 +326,11 @@ a {
 .invite-card.status-accepted {
   border-color: rgba(52, 211, 153, 0.6);
   box-shadow: 0 0 28px rgba(52, 211, 153, 0.2);
+}
+
+.invite-card.status-maybe {
+  border-color: rgba(242, 201, 76, 0.5);
+  box-shadow: 0 0 24px rgba(242, 201, 76, 0.18);
 }
 
 .invite-card.status-rejected {
@@ -493,6 +502,11 @@ a {
   color: #f2c94c;
 }
 
+.status-banner.status-maybe {
+  border-color: rgba(242, 201, 76, 0.5);
+  color: #f2c94c;
+}
+
 .status-banner.status-accepted {
   border-color: rgba(52, 211, 153, 0.6);
   color: #34d399;
@@ -565,8 +579,12 @@ a {
 }
 
 .accordion.is-open {
-  max-height: 260px;
+  max-height: 420px;
   opacity: 1;
+}
+
+.is-hidden {
+  display: none;
 }
 
 .quote {

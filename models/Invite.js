@@ -8,6 +8,12 @@ const InviteSchema = new mongoose.Schema(
       ref: "Student",
       required: true
     },
+    whyYou: { type: String },
+    about: {
+      greenFlag: { type: String },
+      passion: { type: String },
+      trait: { type: String }
+    },
     message: { type: String, required: true },
     questions: {
       q1: { type: String },
@@ -15,15 +21,19 @@ const InviteSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
+      enum: ["pending", "accepted", "maybe", "rejected"],
       default: "pending"
     },
     response: {
       rating: { type: Number },
       comment: { type: String },
-      consider: { type: Boolean },
+      feeling: { type: String },
+      standout: { type: String },
+      openness: { type: String },
       phone: { type: String },
-      insta: { type: String }
+      insta: { type: String },
+      contactMethod: { type: String },
+      allowFollowup: { type: Boolean }
     },
     secretToken: { type: String, required: true, unique: true }
   },

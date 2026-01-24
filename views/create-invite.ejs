@@ -12,7 +12,7 @@
     </div>
   </div>
   <p class="mt-4 text-sm text-slate-300">
-    Your name will stay anonymous. Be kind, be playful, and be unforgettable.
+    Your name stays anonymous. Keep it sincere, respectful, and human.
   </p>
 
   <form class="form" action="/invites" method="POST">
@@ -20,42 +20,77 @@
 
     <div class="question-card">
       <label>
-        Personal message / pickup line
+        Section A — Why You?
+        <div class="muted tiny mt-1">What made you want to send this to them? (1-2 sentences)</div>
         <textarea
-          name="message"
-          rows="4"
+          name="whyYou"
+          rows="3"
           required
+          maxlength="220"
           class="textarea-field"
-          placeholder="Write something sweet, clever, or bold."
+          placeholder="Example: I noticed how you always show up early to help others, and it stuck with me."
         ></textarea>
       </label>
     </div>
 
     <div class="question-card">
       <label>
-        Fun question #1
-        <input
-          type="text"
-          name="q1"
-          class="input-field"
-          placeholder="Ex: If we were in a movie, which scene would we be in?"
-        />
+        Section B — Who I Am (Without My Name)
+        <div class="muted tiny mt-1">Short, honest answers. Real > impressive.</div>
       </label>
+      <div class="grid gap-4 mt-4">
+        <label>
+          One green flag about me
+          <input
+            type="text"
+            name="greenFlag"
+            required
+            maxlength="120"
+            class="input-field"
+            placeholder="Example: I’m the friend who actually follows through."
+          />
+        </label>
+        <label>
+          One thing I’m genuinely passionate about
+          <input
+            type="text"
+            name="passion"
+            required
+            maxlength="120"
+            class="input-field"
+            placeholder="Example: Portrait photography and late-night edits."
+          />
+        </label>
+        <label>
+          One honest (but respectful) trait
+          <input
+            type="text"
+            name="trait"
+            required
+            maxlength="120"
+            class="input-field"
+            placeholder="Example: I’m shy at first, but warm once we talk."
+          />
+        </label>
+      </div>
     </div>
 
     <div class="question-card">
       <label>
-        Fun question #2
-        <input
-          type="text"
-          name="q2"
-          class="input-field"
-          placeholder="Ex: Your favorite late-night snack?"
-        />
+        Section C — The Message
+        <div class="muted tiny mt-1">Say something you’d never post publicly, but would say sincerely.</div>
+        <textarea
+          name="message"
+          rows="4"
+          required
+          maxlength="600"
+          class="textarea-field"
+          placeholder="Be honest, kind, and clear. No pressure."
+        ></textarea>
       </label>
     </div>
 
-    <button class="btn btn-primary" type="submit">Send Anonymous Confession</button>
+    <button class="btn btn-primary" type="submit">Send Thoughtful Invite</button>
   </form>
 </section>
 

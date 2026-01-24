@@ -24,10 +24,21 @@ router.get("/", ensureAuth, (req, res) => res.redirect("/dashboard"));
 
 router.post("/", ensureAuth, async (req, res, next) => {
   try {
-    const { studentId, message, q1, q2 } = req.body;
+    const { studentId } = req.body;
+    const whyYou = (req.body.whyYou || "").trim().slice(0, 220);
+    const greenFlag = (req.body.greenFlag || "").trim().slice(0, 120);
+    const passion = (req.body.passion || "").trim().slice(0, 120);
+    const trait = (req.body.trait || "").trim().slice(0, 120);
+    const message = (req.body.message || "").trim().slice(0, 600);
     const student = await Student.findById(studentId);
     if (!student) {
       return res.redirect("/dashboard");
+    }
+    if (!whyYou || !greenFlag || !passion || !trait || !message) {
+      return res.status(400).render("error", {
+        title: "Missing details",
+        message: "Please complete all sections before sending your invite."
+      });
     }
     const cooldownMs = 0 * 2 * 24 * 60 * 60 * 1000;
     const latestInvite = await Invite.findOne({
@@ -46,7 +57,12 @@ router.post("/", ensureAuth, async (req, res, next) => {
       sender: req.user._id,
       recipient: student._id,
       message,
-      questions: { q1, q2 },
+      whyYou,
+      about: {
+        greenFlag,
+        passion,
+        trait
+      },
       secretToken: generateToken()
     });
 
@@ -99,9 +115,23 @@ router.post("/:id/edit", ensureAuth, async (req, res, next) => {
     if (invite.status !== "pending") {
       return res.redirect(303, `/invites/${invite._id}`);
     }
-    invite.message = req.body.message || invite.message;
-    invite.questions.q1 = req.body.q1 || invite.questions.q1;
-    invite.questions.q2 = req.body.q2 || invite.questions.q2;
+    const whyYou = (req.body.whyYou || "").trim().slice(0, 220);
+    const greenFlag = (req.body.greenFlag || "").trim().slice(0, 120);
+    const passion = (req.body.passion || "").trim().slice(0, 120);
+    const trait = (req.body.trait || "").trim().slice(0, 120);
+    const message = (req.body.message || "").trim().slice(0, 600);
+    if (!whyYou || !greenFlag || !passion || !trait || !message) {
+      return res.status(400).render("error", {
+        title: "Missing details",
+        message: "Please complete all sections before updating your invite."
+      });
+    }
+    invite.whyYou = whyYou;
+    invite.about = invite.about || {};
+    invite.about.greenFlag = greenFlag;
+    invite.about.passion = passion;
+    invite.about.trait = trait;
+    invite.message = message;
     await invite.save();
     // Force a GET after POST to avoid method-preserving redirects.
     res.redirect(303, `/invites/${invite._id}`);
