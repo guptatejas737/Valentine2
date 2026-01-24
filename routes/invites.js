@@ -177,6 +177,7 @@ router.post("/:id/followup", ensureAuth, async (req, res, next) => {
         message: "Please write a message before sending."
       });
     }
+    invite.followups = invite.followups || [];
     invite.followups.push({ message });
     await invite.save();
 

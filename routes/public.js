@@ -98,7 +98,10 @@ router.get("/i/:token/followup/:followupId", async (req, res, next) => {
         message: "This invite link is invalid or expired."
       });
     }
-    const followup = invite.followups?.id(req.params.followupId);
+    const followups = Array.isArray(invite.followups) ? invite.followups : [];
+    const followup = followups.find(
+      (entry) => entry._id && entry._id.toString() === req.params.followupId
+    );
     if (!followup) {
       return res.status(404).render("error", {
         title: "Not found",
@@ -122,7 +125,10 @@ router.post("/i/:token/followup/:followupId", async (req, res, next) => {
         message: "This invite link is invalid or expired."
       });
     }
-    const followup = invite.followups?.id(req.params.followupId);
+    const followups = Array.isArray(invite.followups) ? invite.followups : [];
+    const followup = followups.find(
+      (entry) => entry._id && entry._id.toString() === req.params.followupId
+    );
     if (!followup) {
       return res.status(404).render("error", {
         title: "Not found",
