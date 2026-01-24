@@ -31,17 +31,17 @@
       <% if (invite.status === "pending") { %>
       <p class="mt-2 muted">Waiting for response.</p>
       <% } else { %>
-      <p class="mt-2 text-slate-200">Feeling: <%= invite.response.feeling || "—" %></p>
-      <p class="mt-2 text-slate-200">What stood out: <%= invite.response.standout || "—" %></p>
-      <p class="mt-2 text-slate-200">Open to connect: <%= invite.response.openness || "—" %></p>
-      <% if (invite.response.openness === "yes") { %>
-      <% if (invite.response.contactMethod === "phone") { %>
-      <p class="mt-2 text-slate-200">Phone: <%= invite.response.phone || "—" %></p>
+      <p class="mt-2 text-slate-200">Feeling: <%= invite.response?.feeling || "—" %></p>
+      <p class="mt-2 text-slate-200">What stood out: <%= invite.response?.standout || "—" %></p>
+      <p class="mt-2 text-slate-200">Open to connect: <%= invite.response?.openness || "—" %></p>
+      <% if (invite.response?.openness === "yes") { %>
+      <% if (invite.response?.contactMethod === "phone") { %>
+      <p class="mt-2 text-slate-200">Phone: <%= invite.response?.phone || "—" %></p>
       <% } %>
-      <% if (invite.response.contactMethod === "insta") { %>
-      <p class="mt-2 text-slate-200">Instagram: <%= invite.response.insta || "—" %></p>
+      <% if (invite.response?.contactMethod === "insta") { %>
+      <p class="mt-2 text-slate-200">Instagram: <%= invite.response?.insta || "—" %></p>
       <% } %>
-      <% if (invite.response.contactMethod === "followup") { %>
+      <% if (invite.response?.contactMethod === "followup") { %>
       <p class="mt-2 text-slate-200">Follow-up: One more anonymous message requested.</p>
       <% } %>
       <% } %>

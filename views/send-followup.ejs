@@ -1,0 +1,27 @@
+<%- include("partials/header") %>
+
+<section class="panel glass-panel">
+  <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Anonymous follow-up</p>
+  <h2 class="mt-2 text-2xl font-semibold text-[#c8ccd4]">Send a thoughtful follow-up</h2>
+  <p class="mt-3 text-sm text-slate-300">
+    This stays anonymous. Take your time and write something sincere that helps them know you better.
+  </p>
+
+  <form class="form mt-4" action="/invites/<%= invite._id %>/followup" method="POST">
+    <label>
+      Your message
+      <textarea
+        name="message"
+        rows="8"
+        required
+        maxlength="1500"
+        class="textarea-field"
+        placeholder="Share more about who you are, what you value, and why this matters to you."
+      ></textarea>
+    </label>
+    <button class="btn btn-primary" type="submit">Send follow-up</button>
+  </form>
+</section>
+
+<%- include("partials/footer") %>
+
