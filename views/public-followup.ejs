@@ -1,0 +1,79 @@
+<%- include("partials/header") %>
+
+<section class="panel glass-panel">
+  <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Follow-up message</p>
+  <h2 class="mt-2 text-2xl font-semibold text-[#c8ccd4]">A longer note just for you</h2>
+  <p class="mt-3 text-sm text-slate-300">
+    This is still anonymous, and you’re in control of how you respond.
+  </p>
+
+  <div class="glass-card p-5 mt-6">
+    <h3 class="text-sm uppercase tracking-[0.3em] text-slate-400">Their follow-up</h3>
+    <p class="mt-3 quote">“<%= followup.message %>”</p>
+  </div>
+
+  <div class="divider"></div>
+  <form class="form" action="/i/<%= invite.secretToken %>/followup/<%= followup._id %>" method="POST">
+    <label>
+      Your response
+      <textarea
+        name="message"
+        rows="5"
+        required
+        maxlength="1000"
+        class="textarea-field"
+        placeholder="Share how it made you feel, or anything you want them to know."
+      ></textarea>
+    </label>
+
+    <div>
+      <p class="text-sm text-slate-300">
+        If you’re comfortable, you can leave one way for him to reach you.
+      </p>
+      <div class="choice-grid mt-3">
+        <label class="choice-card">
+          <input type="radio" name="contactMethod" value="phone" />
+          <span class="choice-card__content">Phone number</span>
+        </label>
+        <label class="choice-card">
+          <input type="radio" name="contactMethod" value="insta" />
+          <span class="choice-card__content">Instagram handle</span>
+        </label>
+        <label class="choice-card">
+          <input type="radio" name="contactMethod" value="followup" />
+          <span class="choice-card__content">Let him send one more anonymous message</span>
+        </label>
+      </div>
+      <div id="phoneField" class="mt-4 is-hidden">
+        <label>
+          Phone number
+          <input type="text" name="phone" class="input-field" placeholder="Your phone number" />
+        </label>
+      </div>
+      <div id="instaField" class="mt-4 is-hidden">
+        <label>
+          Instagram handle
+          <input type="text" name="insta" class="input-field" placeholder="@yourhandle" />
+        </label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Send response</button>
+  </form>
+</section>
+
+<script>
+  const contactRadios = document.querySelectorAll("input[name='contactMethod']");
+  const phoneField = document.getElementById("phoneField");
+  const instaField = document.getElementById("instaField");
+
+  contactRadios.forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      phoneField.classList.toggle("is-hidden", e.target.value !== "phone");
+      instaField.classList.toggle("is-hidden", e.target.value !== "insta");
+    });
+  });
+</script>
+
+<%- include("partials/footer") %>
+
