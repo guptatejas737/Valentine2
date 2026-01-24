@@ -1,60 +1,96 @@
 <%- include("partials/header") %>
 
-<section class="panel">
-  <h2>Invite details</h2>
-  <div class="status-banner status-<%= invite.status %>">
-    Status: <strong><%= invite.status %></strong>
-  </div>
+<section class="relative z-10">
+  <div class="mx-auto max-w-4xl rounded-[28px] border border-white/10 bg-white/5 p-8 backdrop-blur-2xl sm:p-10">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.3em] text-white/50">Invite Details</p>
+        <h2 class="mt-2 text-3xl font-semibold">Status check</h2>
+      </div>
+      <div
+        class="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/70"
+      >
+        <span
+          class="h-2.5 w-2.5 rounded-full <%= invite.status === 'accepted' ? 'bg-emerald-400' : invite.status === 'rejected' ? 'bg-red-400' : 'bg-amber-400 animate-pulse' %>"
+        ></span>
+        <span><%= invite.status %></span>
+      </div>
+    </div>
 
-  <div class="detail-grid">
-    <div>
-      <h3>Recipient</h3>
-      <p><%= invite.recipient.name %> (#<%= invite.recipient.rollNumber %>)</p>
+    <div class="mt-8 grid gap-4 md:grid-cols-2">
+      <div class="rounded-2xl border border-white/10 bg-black/40 p-5">
+        <h3 class="text-sm font-semibold">Recipient</h3>
+        <p class="mt-2 text-sm text-white/70"><%= invite.recipient.name %> (#<%= invite.recipient.rollNumber %>)</p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-black/40 p-5">
+        <h3 class="text-sm font-semibold">Your message</h3>
+        <p class="mt-2 text-sm text-white/70"><%= invite.message %></p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-black/40 p-5">
+        <h3 class="text-sm font-semibold">Fun questions</h3>
+        <p class="mt-2 text-sm text-white/70"><%= invite.questions.q1 || "—" %></p>
+        <p class="mt-2 text-sm text-white/70"><%= invite.questions.q2 || "—" %></p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-black/40 p-5">
+        <h3 class="text-sm font-semibold">Response</h3>
+        <% if (invite.status === "pending") { %>
+        <p class="mt-2 text-sm text-white/60">Waiting for response.</p>
+        <% } else { %>
+        <p class="mt-2 text-sm text-white/70">Rating: <%= invite.response.rating %>/10</p>
+        <p class="mt-2 text-sm text-white/70">Comment: <%= invite.response.comment || "—" %></p>
+        <p class="mt-2 text-sm text-white/70">Consider: <%= invite.response.consider ? "Yes" : "No" %></p>
+        <% if (invite.response.consider) { %>
+        <div class="mt-3 rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-xs text-emerald-100">
+          <div>Phone: <%= invite.response.phone || "—" %></div>
+          <div class="mt-1">Insta: <%= invite.response.insta || "—" %></div>
+        </div>
+        <% } %>
+        <% } %>
+      </div>
     </div>
-    <div>
-      <h3>Message</h3>
-      <p><%= invite.message %></p>
-    </div>
-    <div>
-      <h3>Fun Questions</h3>
-      <p><%= invite.questions.q1 || "—" %></p>
-      <p><%= invite.questions.q2 || "—" %></p>
-    </div>
-    <div>
-      <h3>Response</h3>
-      <% if (invite.status === "pending") { %>
-      <p class="muted">Waiting for response.</p>
-      <% } else { %>
-      <p>Rating: <%= invite.response.rating %>/10</p>
-      <p>Comment: <%= invite.response.comment || "—" %></p>
-      <p>Consider: <%= invite.response.consider ? "Yes" : "No" %></p>
-      <% if (invite.response.consider) { %>
-      <p>Phone: <%= invite.response.phone || "—" %></p>
-      <p>Insta: <%= invite.response.insta || "—" %></p>
-      <% } %>
-      <% } %>
-    </div>
-  </div>
 
-  <% if (invite.status === "pending") { %>
-  <div class="divider"></div>
-  <h3>Edit invite (pending only)</h3>
-  <form class="form" action="/invites/<%= invite._id %>/edit" method="POST">
-    <label>
-      Personal message / pickup line
-      <textarea name="message" rows="4" required><%= invite.message %></textarea>
-    </label>
-    <label>
-      Fun question #1
-      <input type="text" name="q1" value="<%= invite.questions.q1 || "" %>" />
-    </label>
-    <label>
-      Fun question #2
-      <input type="text" name="q2" value="<%= invite.questions.q2 || "" %>" />
-    </label>
-    <button class="btn btn-primary" type="submit">Update invite</button>
-  </form>
-  <% } %>
+    <% if (invite.status === "pending") { %>
+    <div class="mt-8 border-t border-white/10 pt-6">
+      <h3 class="text-lg font-semibold">Edit invite (pending only)</h3>
+      <p class="mt-1 text-xs text-white/50">You can refine your message until they respond.</p>
+      <form class="mt-5 space-y-4" action="/invites/<%= invite._id %>/edit" method="POST">
+        <label class="text-sm font-semibold text-white/90">
+          Personal message / pickup line
+          <textarea
+            name="message"
+            rows="4"
+            required
+            class="mt-3 w-full border-0 border-b border-white/20 bg-transparent px-1 pb-2 text-sm text-white focus:border-[#ff0055] focus:outline-none"
+          ><%= invite.message %></textarea>
+        </label>
+        <label class="text-sm font-semibold text-white/90">
+          Fun question #1
+          <input
+            type="text"
+            name="q1"
+            value="<%= invite.questions.q1 || '' %>"
+            class="mt-3 w-full border-0 border-b border-white/20 bg-transparent px-1 pb-2 text-sm text-white focus:border-[#ff0055] focus:outline-none"
+          />
+        </label>
+        <label class="text-sm font-semibold text-white/90">
+          Fun question #2
+          <input
+            type="text"
+            name="q2"
+            value="<%= invite.questions.q2 || '' %>"
+            class="mt-3 w-full border-0 border-b border-white/20 bg-transparent px-1 pb-2 text-sm text-white focus:border-[#ff0055] focus:outline-none"
+          />
+        </label>
+        <button
+          class="w-full rounded-full bg-gradient-to-r from-[#ff0055] to-[#7000ff] px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(255,0,85,0.35)] transition hover:shadow-[0_0_45px_rgba(255,0,85,0.5)]"
+          type="submit"
+        >
+          Update invite
+        </button>
+      </form>
+    </div>
+    <% } %>
+  </div>
 </section>
 
 <%- include("partials/footer") %>

@@ -1,56 +1,130 @@
 <%- include("partials/header") %>
 
-<section class="panel">
-  <h2>Anonymous prom invite</h2>
-  <p class="muted">Someone wants to get to know you. The sender's name is hidden.</p>
-
-  <div class="detail-grid">
-    <div>
-      <h3>Pickup line</h3>
-      <p><%= invite.message %></p>
-    </div>
-    <div>
-      <h3>Fun questions</h3>
-      <p><%= invite.questions.q1 || "—" %></p>
-      <p><%= invite.questions.q2 || "—" %></p>
-    </div>
-  </div>
-
-  <% if (invite.status !== "pending") { %>
-  <div class="status-banner status-<%= invite.status %>">
-    This invite already has a response.
-  </div>
-  <% } else { %>
-  <div class="divider"></div>
-  <form class="form" action="/i/<%= invite.secretToken %>" method="POST">
-    <label>
-      Rate the pickup line (1-10)
-      <input type="number" name="rating" min="1" max="10" required />
-    </label>
-    <label>
-      Comment / review
-      <textarea name="comment" rows="3" placeholder="Your thoughts..."></textarea>
-    </label>
-    <label class="radio-group">
-      Would you consider going on prom with this person, if you get to know them more?
-      <div class="radio-options">
-        <label><input type="radio" name="consider" value="yes" required /> Yes</label>
-        <label><input type="radio" name="consider" value="no" required /> No</label>
+<section class="relative z-10">
+  <div class="mx-auto max-w-4xl rounded-[32px] border border-white/10 bg-white/5 p-8 backdrop-blur-2xl sm:p-12">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.3em] text-white/50">Anonymous Invite</p>
+        <h2 class="mt-2 text-3xl font-semibold">A secret prom message</h2>
+        <p class="mt-2 text-sm text-white/60">Someone wants to get to know you. Their identity is hidden.</p>
       </div>
-    </label>
-    <div id="contactFields" class="hidden">
-      <label>
-        Phone number
-        <input type="text" name="phone" placeholder="Your phone number" />
-      </label>
-      <label>
-        Instagram handle
-        <input type="text" name="insta" placeholder="@yourhandle" />
-      </label>
+      <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
+        Private • Consent-first
+      </span>
     </div>
-    <button class="btn btn-primary" type="submit">Submit response</button>
-  </form>
-  <% } %>
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-2">
+      <div class="rounded-3xl border border-white/10 bg-black/50 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <p class="text-xs uppercase tracking-[0.3em] text-white/40">Pickup Line</p>
+        <blockquote class="mt-4 text-2xl font-semibold leading-snug text-white">
+          “<%= invite.message %>”
+        </blockquote>
+      </div>
+      <div class="rounded-3xl border border-white/10 bg-black/40 p-6">
+        <p class="text-xs uppercase tracking-[0.3em] text-white/40">Fun Questions</p>
+        <p class="mt-4 text-sm text-white/70"><%= invite.questions.q1 || "—" %></p>
+        <p class="mt-4 text-sm text-white/70"><%= invite.questions.q2 || "—" %></p>
+      </div>
+    </div>
+
+    <% if (invite.status !== "pending") { %>
+    <div class="mt-8 rounded-2xl border border-white/10 bg-black/40 p-4 text-sm text-white/70">
+      This invite already has a response.
+    </div>
+    <% } else { %>
+    <div class="mt-8 rounded-2xl border border-white/10 bg-black/40 p-4">
+      <h4 class="text-sm font-semibold">Your response stays private</h4>
+      <p class="mt-1 text-xs text-white/60">
+        The sender only sees your feedback and contact details if you choose “Yes.”
+      </p>
+    </div>
+
+    <form class="mt-8 space-y-6" action="/i/<%= invite.secretToken %>" method="POST">
+      <div class="rounded-2xl border border-white/10 bg-black/40 p-5">
+        <label class="text-sm font-semibold text-white/90">
+          Rate the pickup line (1-10)
+          <input
+            class="mt-3 w-24 border-0 border-b border-white/20 bg-transparent px-1 pb-2 text-sm text-white focus:border-[#ff0055] focus:outline-none"
+            type="number"
+            name="rating"
+            min="1"
+            max="10"
+            required
+          />
+        </label>
+        <p class="mt-2 text-xs text-white/50">1 = not your vibe, 10 = prom royalty.</p>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-black/40 p-5">
+        <label class="text-sm font-semibold text-white/90">
+          Comment / review
+          <textarea
+            name="comment"
+            rows="3"
+            placeholder="Your thoughts..."
+            class="mt-3 w-full border-0 border-b border-white/20 bg-transparent px-1 pb-2 text-sm text-white placeholder:text-white/40 focus:border-[#ff0055] focus:outline-none"
+          ></textarea>
+        </label>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-black/40 p-5">
+        <p class="text-sm font-semibold text-white/90">
+          Would you consider going on prom with this person, if you get to know them more?
+        </p>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <label class="group cursor-pointer">
+            <input type="radio" name="consider" value="no" required class="peer sr-only" />
+            <div
+              class="flex h-full flex-col gap-2 rounded-2xl border border-white/10 bg-black/40 p-5 text-sm text-white/70 transition peer-checked:border-white/30 peer-checked:bg-white/5"
+            >
+              <span class="text-base font-semibold">Not my vibe</span>
+              <span class="text-xs text-white/50">A gentle no, no pressure.</span>
+            </div>
+          </label>
+          <label class="group cursor-pointer">
+            <input type="radio" name="consider" value="yes" required class="peer sr-only" />
+            <div
+              class="flex h-full flex-col gap-2 rounded-2xl border border-white/10 bg-gradient-to-br from-[#ff0055]/30 to-[#7000ff]/30 p-5 text-sm text-white/80 transition peer-checked:border-[#ff0055]/60 peer-checked:shadow-[0_0_30px_rgba(255,0,85,0.4)]"
+            >
+              <span class="text-base font-semibold text-white">I’m interested...</span>
+              <span class="text-xs text-white/60">Let’s exchange contact details.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div id="contactFields" class="accordion">
+        <div class="grid gap-4 sm:grid-cols-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5">
+          <label class="text-sm font-semibold text-white/90">
+            Phone number
+            <input
+              type="text"
+              name="phone"
+              placeholder="Your phone number"
+              class="mt-3 w-full border-0 border-b border-white/20 bg-transparent px-1 pb-2 text-sm text-white placeholder:text-white/40 focus:border-[#ff0055] focus:outline-none"
+            />
+          </label>
+          <label class="text-sm font-semibold text-white/90">
+            Instagram handle
+            <input
+              type="text"
+              name="insta"
+              placeholder="@yourhandle"
+              class="mt-3 w-full border-0 border-b border-white/20 bg-transparent px-1 pb-2 text-sm text-white placeholder:text-white/40 focus:border-[#ff0055] focus:outline-none"
+            />
+          </label>
+        </div>
+      </div>
+
+      <button
+        class="w-full rounded-full bg-gradient-to-r from-[#ff0055] to-[#7000ff] px-6 py-3 text-sm font-semibold text-white shadow-[0_0_30px_rgba(255,0,85,0.35)] transition hover:shadow-[0_0_45px_rgba(255,0,85,0.5)]"
+        type="submit"
+      >
+        Submit response
+      </button>
+    </form>
+    <% } %>
+  </div>
 </section>
 
 <script>
@@ -59,9 +133,9 @@
   radios.forEach((radio) => {
     radio.addEventListener("change", (e) => {
       if (e.target.value === "yes") {
-        contactFields.classList.remove("hidden");
+        contactFields.classList.add("open");
       } else {
-        contactFields.classList.add("hidden");
+        contactFields.classList.remove("open");
       }
     });
   });

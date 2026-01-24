@@ -3,7 +3,7 @@ const Invite = require("../models/Invite");
 const Student = require("../models/Student");
 const { ensureAuth } = require("../utils/auth");
 const { generateToken } = require("../utils/token");
-const { sendMail } = require("../utils/mailer");
+const { sendMail, buildInviteEmail } = require("../utils/mailer");
 
 const router = express.Router();
 
@@ -36,11 +36,18 @@ router.post("/", ensureAuth, async (req, res, next) => {
 
     const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
     const inviteLink = `${baseUrl}/i/${invite.secretToken}`;
+    const roll = (student.rollNumber || "").trim().toLowerCase();
+    const domain = process.env.ALLOWED_EMAIL_DOMAIN || "smail.iitm.ac.in";
+    const recipientEmail = student.email || (roll ? `${roll}@${domain}` : "");
+    const inviteEmail = buildInviteEmail({
+      recipientName: student.name,
+      inviteLink
+    });
     await sendMail({
-      to: student.email,
-      subject: "You have a new anonymous prom invite!",
-      text: `Someone tagged you in an anonymous confession. View it here: ${inviteLink}`,
-      html: `<p>Someone tagged you in an anonymous confession.</p><p><a href="${inviteLink}">Open your secret invite</a></p>`
+      to: recipientEmail,
+      subject: "You have a secret prom invite",
+      text: inviteEmail.text,
+      html: inviteEmail.html
     });
 
     res.redirect(`/invites/${invite._id}`);

@@ -1,6 +1,6 @@
 const express = require("express");
 const Invite = require("../models/Invite");
-const { sendMail } = require("../utils/mailer");
+const { sendMail, buildResponseEmail } = require("../utils/mailer");
 
 const router = express.Router();
 
@@ -45,11 +45,18 @@ router.post("/i/:token", async (req, res, next) => {
     invite.status = invite.response.consider ? "accepted" : "rejected";
     await invite.save();
 
+    const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const inviteDetailsLink = `${baseUrl}/invites/${invite._id}`;
+    const responseEmail = buildResponseEmail({
+      recipientName: invite.recipient.name,
+      status: invite.status,
+      inviteLink: inviteDetailsLink
+    });
     await sendMail({
       to: invite.sender.email,
-      subject: "Your prom invite has a response!",
-      text: `Your invite to ${invite.recipient.name} has been ${invite.status}.`,
-      html: `<p>Your invite to ${invite.recipient.name} has been <strong>${invite.status}</strong>.</p>`
+      subject: "Your invite has a response",
+      text: responseEmail.text,
+      html: responseEmail.html
     });
 
     return res.render("response-thanks", { invite });
