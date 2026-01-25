@@ -192,12 +192,26 @@ router.get("/i/:token/followup/:followupId", async (req, res, next) => {
       message: typeof followup.message === "string" ? followup.message : String(followup.message || "")
     };
     const followupCount = followups.length;
+    const currentIndex = followups.findIndex(
+      (entry) => entry._id && entry._id.toString() === req.params.followupId
+    );
+    const previousFollowups =
+      currentIndex > 0
+        ? followups
+            .slice(0, currentIndex)
+            .map((entry) => ({
+              _id: entry._id,
+              message:
+                typeof entry.message === "string" ? entry.message : String(entry.message || "")
+            }))
+        : [];
     const allowMoreFollowups = followupCount < FOLLOWUP_LIMIT;
     return res.render(
       "public-followup",
       {
         invite,
         followup: safeFollowup,
+        previousFollowups,
         followupCount,
         followupLimit: FOLLOWUP_LIMIT,
         allowMoreFollowups

@@ -150,16 +150,23 @@ router.post("/", ensureAuth, async (req, res, next) => {
         message: "Please complete all sections before sending your invite."
       });
     }
-    const cooldownMs = 1 * 2 * 24 * 60 * 60 * 1000;
+    const cooldownByStatus = {
+      rejected: 24 * 60 * 60 * 1000,
+      maybe: 4 * 60 * 60 * 1000
+    };
     const latestInvite = await Invite.findOne({
       sender: req.user._id,
       recipient: student._id
     }).sort({ createdAt: -1 });
-    if (latestInvite && Date.now() - latestInvite.createdAt.getTime() < cooldownMs) {
+    const cooldownMs = latestInvite ? cooldownByStatus[latestInvite.status] || 0 : 0;
+    if (latestInvite && cooldownMs && Date.now() - latestInvite.createdAt.getTime() < cooldownMs) {
+      const waitText =
+        latestInvite.status === "maybe"
+          ? "Please wait at least 4 hours before sending another request."
+          : "Please wait at least 1 day before sending another request.";
       return res.status(429).render("error", {
         title: "Slow down",
-        message:
-          "You already sent a request to this person recently. Please wait at least 2 days before sending another request."
+        message: `You already sent a request to this person recently. ${waitText}`
       });
     }
 
