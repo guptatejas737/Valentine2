@@ -41,11 +41,11 @@ const renderFollowupFallback = (res, invite, followup) => {
           <form method="POST" action="${action}">
             <label>Your response</label>
             <textarea name="message" rows="5" required maxlength="1000"></textarea>
-            <p class="muted" style="margin-top:14px;">If you’re comfortable, you can leave one way for him to reach you.</p>
+            <p class="muted" style="margin-top:14px;">If you’re comfortable, you can leave one way for them to reach you.</p>
             <div class="grid">
               <label><input type="radio" name="contactMethod" value="phone" /> Phone number</label>
               <label><input type="radio" name="contactMethod" value="insta" /> Instagram handle</label>
-              <label><input type="radio" name="contactMethod" value="followup" /> Let him send one more anonymous message</label>
+              <label><input type="radio" name="contactMethod" value="followup" /> Let them send one more anonymous message</label>
             </div>
             <label style="margin-top:12px;display:block;">Phone number</label>
             <input type="text" name="phone" />
