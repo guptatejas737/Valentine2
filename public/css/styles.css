@@ -215,7 +215,7 @@ a {
 
 .dashboard {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr) 280px;
   gap: 24px;
   align-items: start;
 }
@@ -356,14 +356,16 @@ a {
 
 .search-card {
   padding: 40px;
+  border: 1px solid rgba(255, 0, 85, 0.25);
+  box-shadow: 0 0 40px rgba(112, 0, 255, 0.18);
 }
 
 .spotlight-wrap {
   margin-top: 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 0, 85, 0.12), rgba(112, 0, 255, 0.12));
+  border: 1px solid rgba(255, 0, 85, 0.35);
   border-radius: 18px;
-  padding: 14px 16px;
+  padding: 18px 20px;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -378,7 +380,8 @@ a {
   border: none;
   outline: none;
   color: #fff;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
+  font-weight: 500;
 }
 
 .spotlight-input::placeholder {
@@ -413,6 +416,36 @@ a {
   text-align: left;
   display: grid;
   gap: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.sidebar-right {
+  padding: 20px;
+}
+
+.instruction-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.instruction-item {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.instruction-title {
+  font-weight: 600;
+  color: #f7f3f6;
+  font-size: 14px;
+}
+
+.instruction-text {
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .manual-title {
