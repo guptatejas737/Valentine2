@@ -6,6 +6,8 @@ const { generateToken } = require("../utils/token");
 const { sendMail } = require("../utils/mailer");
 const { inviteEmail, followupInviteEmail } = require("../utils/emailTemplates");
 
+const FOLLOWUP_LIMIT = 3;
+
 const router = express.Router();
 
 router.get("/new", ensureAuth, async (req, res, next) => {
@@ -152,7 +154,23 @@ router.get("/:id/followup", ensureAuth, async (req, res, next) => {
     if (!canFollowup) {
       return res.redirect(`/invites/${invite._id}`);
     }
-    return res.render("send-followup", { invite });
+    invite.followups = invite.followups || [];
+    const followupCount = invite.followups.length;
+    const pendingFollowup = invite.followups.find((entry) => !entry.response?.createdAt);
+    if (!pendingFollowup && followupCount >= FOLLOWUP_LIMIT) {
+      return res.status(400).render("error", {
+        title: "Limit reached",
+        message:
+          "This invite has reached the maximum of 3 anonymous follow-up requests."
+      });
+    }
+    return res.render("send-followup", {
+      invite,
+      followup: pendingFollowup || null,
+      isEdit: Boolean(pendingFollowup),
+      followupCount,
+      followupLimit: FOLLOWUP_LIMIT
+    });
   } catch (err) {
     next(err);
   }
@@ -170,6 +188,9 @@ router.post("/:id/followup", ensureAuth, async (req, res, next) => {
     if (!canFollowup) {
       return res.redirect(`/invites/${invite._id}`);
     }
+    invite.followups = invite.followups || [];
+    const followupCount = invite.followups.length;
+    const pendingFollowup = invite.followups.find((entry) => !entry.response?.createdAt);
     const message = (req.body.message || "").trim().slice(0, 1500);
     if (!message) {
       return res.status(400).render("error", {
@@ -177,7 +198,18 @@ router.post("/:id/followup", ensureAuth, async (req, res, next) => {
         message: "Please write a message before sending."
       });
     }
-    invite.followups = invite.followups || [];
+    if (pendingFollowup) {
+      pendingFollowup.message = message;
+      await invite.save();
+      return res.redirect(303, `/invites/${invite._id}`);
+    }
+    if (followupCount >= FOLLOWUP_LIMIT) {
+      return res.status(400).render("error", {
+        title: "Limit reached",
+        message:
+          "This invite has reached the maximum of 3 anonymous follow-up requests."
+      });
+    }
     invite.followups.push({ message });
     await invite.save();
 

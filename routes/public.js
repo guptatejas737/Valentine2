@@ -3,6 +3,8 @@ const Invite = require("../models/Invite");
 const { sendMail } = require("../utils/mailer");
 const { responseEmail, followupResponseEmail } = require("../utils/emailTemplates");
 
+const FOLLOWUP_LIMIT = 3;
+
 const escapeHtml = (value) =>
   String(value || "")
     .replace(/&/g, "&amp;")
@@ -70,7 +72,14 @@ router.get("/i/:token", async (req, res, next) => {
         message: "This invite link is invalid or expired."
       });
     }
-    return res.render("public-invite", { invite });
+    const followupCount = Array.isArray(invite.followups) ? invite.followups.length : 0;
+    const allowMoreFollowups = followupCount < FOLLOWUP_LIMIT;
+    return res.render("public-invite", {
+      invite,
+      followupCount,
+      followupLimit: FOLLOWUP_LIMIT,
+      allowMoreFollowups
+    });
   } catch (err) {
     next(err);
   }
@@ -98,6 +107,8 @@ router.post("/i/:token", async (req, res, next) => {
     const phone = (req.body.phone || "").trim();
     const insta = (req.body.insta || "").trim();
     const allowFollowup = Boolean(req.body.allowFollowup);
+    const followupCount = Array.isArray(invite.followups) ? invite.followups.length : 0;
+    const allowMoreFollowups = followupCount < FOLLOWUP_LIMIT;
 
     if (!feeling || !standout || !["yes", "maybe", "no"].includes(openness)) {
       return res.status(400).render("error", {
@@ -110,6 +121,13 @@ router.post("/i/:token", async (req, res, next) => {
     invite.response.standout = standout;
     invite.response.openness = openness;
     const isOpen = openness === "yes";
+    if (isOpen && contactMethod === "followup" && !allowMoreFollowups) {
+      return res.status(400).render("error", {
+        title: "Limit reached",
+        message:
+          "This invite has reached the maximum of 3 anonymous follow-up requests."
+      });
+    }
     invite.response.contactMethod = isOpen ? contactMethod : "";
     invite.response.phone = isOpen && contactMethod === "phone" ? phone : "";
     invite.response.insta = isOpen && contactMethod === "insta" ? insta : "";
@@ -166,13 +184,25 @@ router.get("/i/:token/followup/:followupId", async (req, res, next) => {
       _id: followup._id,
       message: typeof followup.message === "string" ? followup.message : String(followup.message || "")
     };
-    return res.render("public-followup", { invite, followup: safeFollowup }, (err, html) => {
+    const followupCount = followups.length;
+    const allowMoreFollowups = followupCount < FOLLOWUP_LIMIT;
+    return res.render(
+      "public-followup",
+      {
+        invite,
+        followup: safeFollowup,
+        followupCount,
+        followupLimit: FOLLOWUP_LIMIT,
+        allowMoreFollowups
+      },
+      (err, html) => {
       if (err) {
         console.error("Failed to render public-followup:", err);
         return renderFollowupFallback(res, invite, safeFollowup);
       }
       return res.send(html);
-    });
+      }
+    );
   } catch (err) {
     next(err);
   }
@@ -207,11 +237,19 @@ router.post("/i/:token/followup/:followupId", async (req, res, next) => {
     const contactMethod = (req.body.contactMethod || "").trim();
     const phone = (req.body.phone || "").trim();
     const insta = (req.body.insta || "").trim();
+    const allowMoreFollowups = followups.length < FOLLOWUP_LIMIT;
 
     if (!message) {
       return res.status(400).render("error", {
         title: "Missing response",
         message: "Please write a response before submitting."
+      });
+    }
+    if (contactMethod === "followup" && !allowMoreFollowups) {
+      return res.status(400).render("error", {
+        title: "Limit reached",
+        message:
+          "This invite has reached the maximum of 3 anonymous follow-up requests."
       });
     }
 

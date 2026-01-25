@@ -111,7 +111,7 @@
         <p class="text-sm text-slate-300 mt-4">
           If you’re comfortable, you can leave one way for him to reach you.
         </p>
-        <div class="choice-grid mt-3">
+      <div class="choice-grid mt-3">
           <label class="choice-card">
             <input type="radio" name="contactMethod" value="phone" />
             <span class="choice-card__content">Phone number</span>
@@ -120,11 +120,21 @@
             <input type="radio" name="contactMethod" value="insta" />
             <span class="choice-card__content">Instagram handle</span>
           </label>
+        <% if (allowMoreFollowups) { %>
           <label class="choice-card">
             <input type="radio" name="contactMethod" value="followup" />
             <span class="choice-card__content">Let him send one more anonymous message</span>
           </label>
+        <% } %>
         </div>
+      <p class="muted tiny mt-2">
+        Anonymous follow-up limit: <%= followupCount %>/<%= followupLimit %>
+      </p>
+      <% if (!allowMoreFollowups) { %>
+      <p class="muted tiny mt-2">
+        You’ve reached the 3‑message limit. You can still share your contact.
+      </p>
+      <% } %>
         <div id="phoneField" class="mt-4 is-hidden">
           <label>
             Phone number
