@@ -14,6 +14,8 @@ const dashboardRoutes = require("./routes/dashboard");
 const inviteRoutes = require("./routes/invites");
 const apiRoutes = require("./routes/api");
 const publicRoutes = require("./routes/public");
+const feedbackRoutes = require("./routes/feedback");
+const adminRoutes = require("./routes/admin");
 
 const createApp = async () => {
   const app = express();
@@ -69,6 +71,8 @@ const createApp = async () => {
   app.use("/dashboard", dashboardRoutes);
   app.use("/invites", inviteRoutes);
   app.use("/api", apiRoutes);
+  app.use("/feedback", feedbackRoutes);
+  app.use("/admin", adminRoutes);
   app.use("/", publicRoutes);
 
   app.use((req, res) => {
