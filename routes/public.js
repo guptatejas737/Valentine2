@@ -4,6 +4,12 @@ const { sendMail } = require("../utils/mailer");
 const { responseEmail, followupResponseEmail } = require("../utils/emailTemplates");
 
 const FOLLOWUP_LIMIT = 3;
+const getSubjectName = (fullName) =>
+  String(fullName || "")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join(" ");
 
 const escapeHtml = (value) =>
   String(value || "")
@@ -146,9 +152,10 @@ router.post("/i/:token", async (req, res, next) => {
       recipientName: invite.recipient.name,
       status: invite.status
     });
+    const subjectName = getSubjectName(invite.recipient?.name);
     await sendMail({
       to: invite.sender.email,
-      subject: "Your prom invite has a response!",
+      subject: subjectName ? `${subjectName} responded` : "You received a response",
       text: mailContent.text,
       html: mailContent.html
     });
@@ -267,9 +274,10 @@ router.post("/i/:token/followup/:followupId", async (req, res, next) => {
       recipientName: invite.recipient.name,
       inviteId: invite._id
     });
+    const subjectName = getSubjectName(invite.recipient?.name);
     await sendMail({
       to: invite.sender.email,
-      subject: "Your follow-up received a response",
+      subject: subjectName ? `${subjectName} responded` : "You received a response",
       text: mailContent.text,
       html: mailContent.html
     });

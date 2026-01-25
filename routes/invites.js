@@ -7,6 +7,114 @@ const { sendMail } = require("../utils/mailer");
 const { inviteEmail, followupInviteEmail } = require("../utils/emailTemplates");
 
 const FOLLOWUP_LIMIT = 3;
+const inviteSubjects = [
+  "You have a new anonymous invite",
+  "New anonymous invite received",
+  "A new invite is waiting",
+  "Someone sent you an invite",
+  "You’ve got a new invite",
+  "A new message is waiting",
+  "New message: open now",
+  "You have a new message",
+  "New anonymous message",
+  "A message arrived for you",
+  "You just got an invite",
+  "A new note is waiting",
+  "You received an anonymous note",
+  "You have a private note",
+  "New private message",
+  "A new note for you",
+  "A new message inside",
+  "New invite: open to view",
+  "New anonymous invite inside",
+  "A fresh invite is here",
+  "You have 1 new invite",
+  "New invite for you",
+  "Someone wrote to you",
+  "You’ve got a new note",
+  "New message waiting",
+  "A new note just arrived",
+  "Anonymous invite waiting",
+  "New invite alert",
+  "You have a new anonymous note",
+  "New invite: read now",
+  "A new message from someone",
+  "Someone reached out",
+  "You have a new invite waiting",
+  "New invite received today",
+  "A new anonymous invite just arrived",
+  "New message: see details",
+  "Invite received",
+  "You received a new invite",
+  "A new note is here",
+  "New anonymous invite for you",
+  "You’ve received a new message",
+  "New invite: don’t miss it",
+  "You have a new note waiting",
+  "Someone sent a note",
+  "New invite: open it",
+  "A new anonymous message is waiting",
+  "New invite: view now",
+  "You’ve got a new message",
+  "A new invite is ready",
+  "New anonymous invite waiting"
+];
+const followupSubjects = [
+  "A follow-up message is waiting",
+  "New follow-up message",
+  "You have a follow-up message",
+  "Follow-up note received",
+  "A new follow-up just arrived",
+  "Follow-up message inside",
+  "New anonymous follow-up",
+  "Another message is waiting",
+  "A new follow-up is here",
+  "Follow-up: open to read",
+  "New follow-up message waiting",
+  "You’ve received a follow-up",
+  "Follow-up received",
+  "A follow-up note for you",
+  "New follow-up: view now",
+  "Another message arrived",
+  "Follow-up message: open now",
+  "You have a new follow-up",
+  "A follow-up just landed",
+  "New follow-up note",
+  "New follow-up alert",
+  "Another anonymous follow-up",
+  "Follow-up message received",
+  "A fresh follow-up is here",
+  "New follow-up: see details",
+  "You got a follow-up",
+  "A follow-up message arrived",
+  "Another follow-up message",
+  "Follow-up: read now",
+  "New follow-up waiting",
+  "A new follow-up is ready",
+  "Follow-up note inside",
+  "You’ve got a follow-up",
+  "Follow-up: open it",
+  "New follow-up for you",
+  "Another message from them",
+  "Follow-up: new message",
+  "You have 1 new follow-up",
+  "A new follow-up message arrived",
+  "Follow-up: don’t miss it",
+  "New follow-up: open now",
+  "Another note is waiting",
+  "Follow-up message for you",
+  "New follow-up: read now",
+  "You received a follow-up",
+  "Follow-up: view now",
+  "A follow-up note just arrived",
+  "New follow-up message received",
+  "A follow-up is waiting",
+  "Another follow-up is here"
+];
+const pickSubject = (subjects, recipientName) => {
+  const base = subjects[Math.floor(Math.random() * subjects.length)];
+  return recipientName ? `${base}, ${recipientName}` : base;
+};
 
 const router = express.Router();
 
@@ -42,7 +150,7 @@ router.post("/", ensureAuth, async (req, res, next) => {
         message: "Please complete all sections before sending your invite."
       });
     }
-    const cooldownMs = 0 * 2 * 24 * 60 * 60 * 1000;
+    const cooldownMs = 1 * 2 * 24 * 60 * 60 * 1000;
     const latestInvite = await Invite.findOne({
       sender: req.user._id,
       recipient: student._id
@@ -84,7 +192,7 @@ router.post("/", ensureAuth, async (req, res, next) => {
     });
     await sendMail({
       to: recipientEmail,
-      subject: "You have a new anonymous prom invite!",
+      subject: pickSubject(inviteSubjects, student.name),
       text: mailContent.text,
       html: mailContent.html
     });
@@ -224,7 +332,7 @@ router.post("/:id/followup", ensureAuth, async (req, res, next) => {
       });
       await sendMail({
         to: recipientEmail,
-        subject: "A follow-up message is waiting",
+        subject: pickSubject(followupSubjects, invite.recipient.name),
         text: mailContent.text,
         html: mailContent.html
       });
