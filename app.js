@@ -26,6 +26,12 @@ const createApp = async () => {
   app.use(morgan("dev"));
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
+  app.get("/favicon.ico", (req, res) => {
+    res.set("Cache-Control", "public, max-age=0, must-revalidate");
+    res
+      .type("image/png")
+      .sendFile(path.join(__dirname, "public", "favicon-32x32.png"));
+  });
   app.use(express.static(path.join(__dirname, "public")));
 
   app.use(
