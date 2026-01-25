@@ -1,6 +1,7 @@
 const express = require("express");
 const Feedback = require("../models/Feedback");
 const { ensureAuth } = require("../utils/auth");
+const { containsProfanity } = require("../utils/profanity");
 
 const router = express.Router();
 
@@ -15,6 +16,12 @@ router.post("/", ensureAuth, async (req, res, next) => {
       return res.status(400).render("error", {
         title: "Empty feedback",
         message: "Please write something before submitting."
+      });
+    }
+    if (containsProfanity(message)) {
+      return res.status(400).render("error", {
+        title: "Inappropriate language",
+        message: "Please remove inappropriate words before submitting."
       });
     }
     await Feedback.create({

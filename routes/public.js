@@ -2,6 +2,7 @@ const express = require("express");
 const Invite = require("../models/Invite");
 const { sendMail } = require("../utils/mailer");
 const { responseEmail, followupResponseEmail } = require("../utils/emailTemplates");
+const { containsProfanity } = require("../utils/profanity");
 
 const FOLLOWUP_LIMIT = 3;
 const getSubjectName = (fullName) =>
@@ -264,6 +265,12 @@ router.post("/i/:token/followup/:followupId", async (req, res, next) => {
       return res.status(400).render("error", {
         title: "Missing response",
         message: "Please write a response before submitting."
+      });
+    }
+    if ([message, phone, insta].some(containsProfanity)) {
+      return res.status(400).render("error", {
+        title: "Inappropriate language",
+        message: "Please remove inappropriate words before submitting."
       });
     }
     if (contactMethod === "followup" && !allowMoreFollowups) {

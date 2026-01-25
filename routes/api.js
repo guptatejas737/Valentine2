@@ -1,6 +1,7 @@
 const express = require("express");
 const Student = require("../models/Student");
 const { ensureAuth } = require("../utils/auth");
+const { containsProfanity } = require("../utils/profanity");
 
 const router = express.Router();
 
@@ -34,6 +35,9 @@ router.post("/students/manual", ensureAuth, async (req, res, next) => {
     const rollNumber = (req.body.rollNumber || "").trim().toLowerCase();
     if (!name || !rollNumber) {
       return res.status(400).json({ error: "Name and roll number are required." });
+    }
+    if ([name, rollNumber].some(containsProfanity)) {
+      return res.status(400).json({ error: "Please remove inappropriate words." });
     }
     const existing = await Student.findOne({ rollNumber });
     if (existing) {

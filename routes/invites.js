@@ -5,6 +5,7 @@ const { ensureAuth } = require("../utils/auth");
 const { generateToken } = require("../utils/token");
 const { sendMail } = require("../utils/mailer");
 const { inviteEmail, followupInviteEmail } = require("../utils/emailTemplates");
+const { containsProfanity } = require("../utils/profanity");
 
 const FOLLOWUP_LIMIT = 3;
 const inviteSubjects = [
@@ -150,6 +151,12 @@ router.post("/", ensureAuth, async (req, res, next) => {
         message: "Please complete all sections before sending your invite."
       });
     }
+    if ([whyYou, greenFlag, passion, trait, message].some(containsProfanity)) {
+      return res.status(400).render("error", {
+        title: "Inappropriate language",
+        message: "Please remove inappropriate words before submitting."
+      });
+    }
     const cooldownByStatus = {
       rejected: 24 * 60 * 60 * 1000,
       maybe: 4 * 60 * 60 * 1000
@@ -243,6 +250,12 @@ router.post("/:id/edit", ensureAuth, async (req, res, next) => {
         message: "Please complete all sections before updating your invite."
       });
     }
+    if ([whyYou, greenFlag, passion, trait, message].some(containsProfanity)) {
+      return res.status(400).render("error", {
+        title: "Inappropriate language",
+        message: "Please remove inappropriate words before submitting."
+      });
+    }
     invite.whyYou = whyYou;
     invite.about = invite.about || {};
     invite.about.greenFlag = greenFlag;
@@ -311,6 +324,12 @@ router.post("/:id/followup", ensureAuth, async (req, res, next) => {
       return res.status(400).render("error", {
         title: "Missing message",
         message: "Please write a message before sending."
+      });
+    }
+    if (containsProfanity(message)) {
+      return res.status(400).render("error", {
+        title: "Inappropriate language",
+        message: "Please remove inappropriate words before submitting."
       });
     }
     if (pendingFollowup) {

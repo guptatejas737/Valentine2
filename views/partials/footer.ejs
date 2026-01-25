@@ -1,4 +1,65 @@
     </main>
+    <script>
+      (() => {
+        const patterns = [
+          "boob(?:s|ies)?",
+          "sex(?:y|ual|s|ed|ing)?",
+          "sext(?:s|ed|ing)?",
+          "fuck(?:er|ers|ed|ing|s)?",
+          "shit(?:ty|ted|ting|s)?",
+          "bitch(?:es|y|ing)?",
+          "slut(?:s)?",
+          "whore(?:s)?",
+          "dick(?:s)?",
+          "penis(?:es)?",
+          "vagina(?:s|e)?",
+          "pussy(?:s)?",
+          "cock(?:s)?",
+          "tits?",
+          "asshole(?:s)?",
+          "cum(?:s|ming)?",
+          "horny"
+        ];
+        const profanityRegex = new RegExp(`\\b(?:${patterns.join("|")})\\b`, "i");
+
+        const getErrorEl = (field) => {
+          let error = field.parentElement?.querySelector(".field-error");
+          if (!error) {
+            error = document.createElement("div");
+            error.className = "field-error";
+            error.textContent = "Please remove inappropriate words.";
+            field.parentElement?.appendChild(error);
+          }
+          return error;
+        };
+
+        const validateField = (field) => {
+          const value = field.value || "";
+          const hasBad = profanityRegex.test(value);
+          field.classList.toggle("input-error", hasBad);
+          const error = getErrorEl(field);
+          error.style.display = hasBad ? "block" : "none";
+          return !hasBad;
+        };
+
+        const fields = document.querySelectorAll("input[type='text'], textarea");
+        fields.forEach((field) => {
+          field.addEventListener("input", () => validateField(field));
+        });
+
+        document.querySelectorAll("form").forEach((form) => {
+          form.addEventListener("submit", (e) => {
+            let ok = true;
+            form.querySelectorAll("input[type='text'], textarea").forEach((field) => {
+              if (!validateField(field)) ok = false;
+            });
+            if (!ok) {
+              e.preventDefault();
+            }
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
 
