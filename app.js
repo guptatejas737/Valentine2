@@ -51,6 +51,7 @@ const createApp = async () => {
 
   app.use((req, res, next) => {
     res.locals.currentUser = req.user || null;
+    res.locals.gaId = process.env.GA_MEASUREMENT_ID || null;
     next();
   });
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const Feedback = require("../models/Feedback");
+const Invite = require("../models/Invite");
 
 const router = express.Router();
 
@@ -30,6 +31,29 @@ router.get("/", async (req, res, next) => {
       .populate("user", "name email")
       .sort({ createdAt: -1 });
     res.render("admin-feedbacks", { feedbacks });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/invites", async (req, res, next) => {
+  try {
+    const invites = await Invite.find()
+      .populate("sender", "name email")
+      .populate("recipient", "name email rollNumber")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const stats = invites.reduce(
+      (acc, invite) => {
+        acc.total += 1;
+        acc[invite.status] = (acc[invite.status] || 0) + 1;
+        return acc;
+      },
+      { total: 0, pending: 0, accepted: 0, maybe: 0, rejected: 0 }
+    );
+
+    res.render("admin-invites", { invites, stats });
   } catch (err) {
     next(err);
   }

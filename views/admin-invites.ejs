@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Invites</title>
+    <% if (typeof gaId !== 'undefined' && gaId) { %>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= gaId %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '<%= gaId %>');
+    </script>
+    <% } %>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Inter, sans-serif;
+        background: #0a0a0a;
+        color: #f0f0f0;
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, #ff0055, #7000ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .nav {
+        margin: 16px 0 28px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .nav a {
+        color: #f0f0f0;
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        font-size: 13px;
+      }
+      .nav a.active {
+        background: linear-gradient(135deg, #ff0055, #7000ff);
+        color: #fff;
+        border: none;
+      }
+      .subtitle {
+        color: #888;
+        margin-bottom: 16px;
+      }
+      .stats {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+      .stat {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 13px;
+        color: #ddd;
+      }
+      .stat strong {
+        color: #ff4d8d;
+        margin-left: 6px;
+      }
+      .invite-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .invite-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 20px;
+      }
+      .invite-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .party {
+        display: grid;
+        gap: 4px;
+        font-size: 13px;
+      }
+      .party strong {
+        color: #f0f0f0;
+      }
+      .muted {
+        color: #888;
+      }
+      .badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .badge.pending {
+        color: #f6c453;
+        border-color: rgba(246, 196, 83, 0.4);
+      }
+      .badge.accepted {
+        color: #3ddc97;
+        border-color: rgba(61, 220, 151, 0.4);
+      }
+      .badge.maybe {
+        color: #4da3ff;
+        border-color: rgba(77, 163, 255, 0.4);
+      }
+      .badge.rejected {
+        color: #ff6b6b;
+        border-color: rgba(255, 107, 107, 0.4);
+      }
+      .section {
+        margin-top: 14px;
+        display: grid;
+        gap: 10px;
+      }
+      .section h3 {
+        font-size: 14px;
+        color: #f5c2d6;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 14px;
+        color: #ddd;
+      }
+      .field span {
+        color: #888;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .empty {
+        text-align: center;
+        color: #666;
+        padding: 60px 20px;
+      }
+      .followup-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 12px;
+        display: grid;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Invites Panel</h1>
+      <div class="nav">
+        <a href="/admin">Feedback</a>
+        <a class="active" href="/admin/invites">Invites</a>
+      </div>
+      <p class="subtitle">Exhaustive list of invitations and responses.</p>
+      <div class="stats">
+        <div class="stat">Total <strong><%= stats.total %></strong></div>
+        <div class="stat">Pending <strong><%= stats.pending %></strong></div>
+        <div class="stat">Accepted <strong><%= stats.accepted %></strong></div>
+        <div class="stat">Maybe <strong><%= stats.maybe %></strong></div>
+        <div class="stat">Rejected <strong><%= stats.rejected %></strong></div>
+      </div>
+
+      <% if (invites.length === 0) { %>
+      <div class="empty">No invites yet.</div>
+      <% } else { %>
+      <div class="invite-list">
+        <% invites.forEach((invite) => { %>
+        <div class="invite-card">
+          <div class="invite-header">
+            <div class="party">
+              <div><strong>Sender</strong></div>
+              <div><%= invite.sender?.name || "Unknown" %></div>
+              <div class="muted"><%= invite.sender?.email || "—" %></div>
+            </div>
+            <div class="party">
+              <div><strong>Recipient</strong></div>
+              <div><%= invite.recipient?.name || "Unknown" %></div>
+              <div class="muted">
+                <%= invite.recipient?.email || invite.recipient?.rollNumber || "—" %>
+              </div>
+            </div>
+            <div class="party">
+              <span class="badge <%= invite.status %>"><%= invite.status %></span>
+              <div class="muted">
+                <%= new Date(invite.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) %>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Invite Details</h3>
+            <div class="field">
+              <span>Why You</span>
+              <div><%= invite.whyYou || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Green Flag</span>
+              <div><%= invite.about?.greenFlag || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Passion</span>
+              <div><%= invite.about?.passion || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Trait</span>
+              <div><%= invite.about?.trait || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Message</span>
+              <div><%= invite.message || "—" %></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Response Details</h3>
+            <% if (invite.response?.feeling || invite.response?.standout || invite.response?.openness) { %>
+            <div class="field">
+              <span>Feeling</span>
+              <div><%= invite.response?.feeling || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Standout</span>
+              <div><%= invite.response?.standout || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Openness</span>
+              <div><%= invite.response?.openness || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Contact Method</span>
+              <div><%= invite.response?.contactMethod || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Phone</span>
+              <div><%= invite.response?.phone || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Instagram</span>
+              <div><%= invite.response?.insta || "—" %></div>
+            </div>
+            <div class="field">
+              <span>Allow Follow-up</span>
+              <div><%= invite.response?.allowFollowup ? "Yes" : "No" %></div>
+            </div>
+            <% } else { %>
+            <div class="field">
+              <span>Status</span>
+              <div>No response yet.</div>
+            </div>
+            <% } %>
+          </div>
+
+          <div class="section">
+            <h3>Follow-ups</h3>
+            <% if (invite.followups && invite.followups.length) { %>
+            <% invite.followups.forEach((followup) => { %>
+            <div class="followup-card">
+              <div class="field">
+                <span>Follow-up Message</span>
+                <div><%= followup.message || "—" %></div>
+              </div>
+              <div class="field">
+                <span>Follow-up Response</span>
+                <div><%= followup.response?.message || "No response yet." %></div>
+              </div>
+              <div class="field">
+                <span>Contact Method</span>
+                <div><%= followup.response?.contactMethod || "—" %></div>
+              </div>
+              <div class="field">
+                <span>Phone</span>
+                <div><%= followup.response?.phone || "—" %></div>
+              </div>
+              <div class="field">
+                <span>Instagram</span>
+                <div><%= followup.response?.insta || "—" %></div>
+              </div>
+              <div class="field">
+                <span>Allow Follow-up</span>
+                <div><%= followup.response?.allowFollowup ? "Yes" : "No" %></div>
+              </div>
+            </div>
+            <% }) %>
+            <% } else { %>
+            <div class="field">
+              <span>Status</span>
+              <div>No follow-ups.</div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+  </body>
+</html>
+

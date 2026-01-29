@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - Feedbacks</title>
+    <% if (typeof gaId !== 'undefined' && gaId) { %>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= gaId %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '<%= gaId %>');
+    </script>
+    <% } %>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -34,6 +43,25 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+      }
+      .nav {
+        margin: 16px 0 28px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .nav a {
+        color: #f0f0f0;
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        font-size: 13px;
+      }
+      .nav a.active {
+        background: linear-gradient(135deg, #ff0055, #7000ff);
+        color: #fff;
+        border: none;
       }
       .subtitle {
         color: #888;
@@ -94,6 +122,10 @@
   <body>
     <div class="container">
       <h1>Feedback Panel</h1>
+      <div class="nav">
+        <a class="active" href="/admin">Feedback</a>
+        <a href="/admin/invites">Invites</a>
+      </div>
       <p class="subtitle">
         Total feedbacks: <span class="count"><%= feedbacks.length %></span>
       </p>
